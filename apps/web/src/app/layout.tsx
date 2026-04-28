@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   description: "Check Danfo, BRT, and Keke fares across Lagos.",
 };
 
+import Layout from "./components/Layout";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -18,7 +20,9 @@ export default function RootLayout({
           to ensure the background is always Cream.
       */}
       <body className="min-h-full flex flex-col bg-[var(--bg-page)] text-[var(--text-primary)]">
-        {children}
+        <Layout>
+          {children}
+        </Layout>
       </body>
     </html>
   );
