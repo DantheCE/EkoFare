@@ -17,7 +17,7 @@ export const Skeleton = ({
   className?: string;
   variant?: 'default' | 'dark';
 }) => {
-  const shimmerClass = variant === 'dark' ? 'skeleton-shimmer-dark' : 'skeleton-shimmer';
+  const shimmerClass = variant === 'dark' ? 'skeleton-shimmer skeleton-shimmer-dark' : 'skeleton-shimmer';
   
   return (
     <div 
