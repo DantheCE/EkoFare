@@ -70,3 +70,38 @@
   outline: 2px solid var(--green-800);
   outline-offset: 2px;
 }
+
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--grey-100);
+}
+.skeleton-shimmer::after {
+  content: "";
+  position: absolute; inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.65) 50%,
+    transparent 100%
+  );
+  animation: ekofare-shimmer 1.4s ease-in-out infinite;
+}
+.skeleton-shimmer-dark { background-color: rgba(255,255,255,0.15); }
+.skeleton-shimmer-dark::after {
+  background: linear-gradient(90deg,
+    transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%);
+}
+@keyframes ekofare-shimmer { 100% { transform: translateX(100%); } }
+
+/* Accessibility: Support users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer::after,
+  .skeleton-shimmer-dark::after {
+    /* Stop the moving animation */
+    animation: none;
+    /* Hide the 'sweep' light effect entirely */
+    display: none;
+  }
+}

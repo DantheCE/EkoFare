@@ -10,42 +10,12 @@
 **Why**: Every other ticket depends on the design token CSS variables and the project scaffold existing.
 
 **Scope**:
-- Initialise pnpm workspace with `apps/web` (Next.js 14 App Router + TypeScript), `apps/api` (Express + TypeScript skeleton), `packages/types` (shared type declarations).
-- Create `apps/web/src/styles/fonts.css` — Google Fonts `@import` for Syne (700, 800) and DM Sans (400, 500, 600). This is the **only** file allowed to have `@import url(…)`.
-- Create `apps/web/src/styles/theme.css` — all `:root` CSS variable tokens from `SPEC.md §4.1` (colour palette, semantic roles, radius scale, shadow scale, spacing base). Also add the global focus-ring rule: `*:focus-visible { outline: 2px solid var(--green-800); outline-offset: 2px; }`.
-- Create `apps/web/src/styles/tailwind.css` and `apps/web/src/styles/index.css` that imports the three style files in order.
-- Verify `pnpm dev` (web) launches without errors and the cream background fills the viewport edge-to-edge at all widths.
-
-**Out of scope**: Any page content, components, or shimmer animation (that's TICKET-002).
-
-**Acceptance criteria**:
-- [ ] `pnpm dev` runs with no TypeScript or build errors.
-- [ ] Opening the app shows a `--cream` (`#F5F0E8`) full-viewport background — no white flash, no grey, no phone bezel shape.
-- [ ] Inspecting `:root` in DevTools shows every colour token from `SPEC.md §4.1` present.
-- [ ] Tabbing to any link or button shows a 2px green-800 focus ring.
-- [ ] No Tailwind `text-{size}`, `font-{weight}`, or `leading-{x}` utilities exist anywhere in the codebase yet.
-
-**Depends on**: none.
-**Estimated**: S (≤ half day).
-
-**Junior-dev hints**:
-- Tailwind v4 uses `@theme` / `@layer` differently from v3. Declare all tokens as plain CSS variables in `:root` inside `theme.css` — do not put them inside `@theme {}` unless you're sure v4's CSS-variable resolution works with the rest of the stack.
-- The focus ring goes in `theme.css` as a global selector, not as a Tailwind plugin.
-- `packages/types/src/index.ts` should export empty stubs now; real types arrive in TICKET-004.
-
-**How to demo**:
-- Open the running app at 390px width — solid cream background, no rounded frame, no clock.
-- Open DevTools → Elements → `:root` — every hex token from `SPEC.md §4.1` visible.
-
----
 
 ### TICKET-002 — Shimmer skeleton system + LoadingPill primitive
 
 **Why**: Loading states appear on every screen; building the primitives once means every subsequent ticket can just import them.
 
 **Scope**:
-- Add shimmer keyframes and `.skeleton-shimmer` / `.skeleton-shimmer-dark` classes to `theme.css` — copy the exact CSS from `SPEC.md §4.5` verbatim.
-- Add `@media (prefers-reduced-motion: reduce)` override that replaces the animation with a static `--grey-100` fill.
 - Create `src/app/components/Skeleton.tsx` exporting: `Skeleton` (base shimmer block, accepts `width`, `height`, `borderRadius`, `className`), `RouteCardSkeleton` (44×44 shimmer tile + two bars + trailing pill), `StopRowSkeleton` (grey-300 ring + connector + variable bar), `LoadingPill` (white rounded-full pill, small green spinner left, "Loading route data…" text, `role="status" aria-live="polite"`).
 - Create a minimal `/dev` stub page at `app/dev/page.tsx` that renders one of each skeleton variant with a label, so the team can visually verify them.
 
