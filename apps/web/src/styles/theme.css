@@ -1,0 +1,72 @@
+:root {
+  /* 4.1 Color tokens */
+  --green-900: #0A3D27;
+  --green-800: #0D5C3A;
+  --green-600: #1A7A50;
+  --green-400: #2DA574;
+  --green-200: #C8E8D8;
+  --green-100: #E1F0E8;
+
+  --terra-900: #7A3410;
+  --terra-700: #B85E1E;
+  --terra-500: #D4722A;
+  --terra-300: #E89B5F;
+  --terra-100: #FAEADA;
+
+  --grey-900: #1C1A18;
+  --grey-700: #4A3F35;
+  --grey-500: #6B5E50;
+  --grey-300: #A89E90;
+  --grey-100: #EAE4DA;
+
+  --cream: #F5F0E8;
+  --white: #FFFFFF;
+  --off-white: #F9F6F1;
+
+  /* Vehicle Colors */
+  --danfo-yellow: #F4B41A;
+  --danfo-yellow-dark: #D69A0F;
+  --brt-blue: #1E88E5;
+  --brt-blue-dark: #1565C0;
+  --keke-red: #E53935;
+  --keke-red-dark: #C62828;
+  --okada-orange: #FB8C00;
+  --ferry-teal: #00897B;
+
+  /* 4.2 Semantic roles (Mapping tokens to usage) */
+  --bg-page: var(--cream);
+  --surface-card: var(--white);
+  --action-primary: var(--green-800);
+  --action-accent: var(--terra-700);
+  --text-primary: var(--grey-900);
+  --text-secondary: var(--grey-700);
+  --text-muted: var(--grey-500);
+  --border-subtle: var(--grey-100);
+
+  /* 4.4 Shape, spacing, elevation */
+  --radius-input: 10px;
+  --radius-button: 10px;
+  --radius-card: 14px;
+  --radius-promo: 16px;
+  --radius-pill: 20px;
+  --radius-full: 9999px;
+
+  /* 4px spacing grid */
+  --spacing-base: 4px;
+  --spacing-xs: 4px;   /* base * 1 */
+  --spacing-sm: 12px;  /* base * 3 */
+  --spacing-md: 16px;  /* base * 4 */
+  --spacing-lg: 24px;  /* base * 6 */
+  --spacing-xl: 32px;  /* base * 8 */
+
+  /* Elevation */
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-nav: 0 -2px 8px rgba(0,0,0,0.06);
+  --shadow-panel: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+/* Global focus-ring rule for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--green-800);
+  outline-offset: 2px;
+}

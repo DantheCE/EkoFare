@@ -1,0 +1,7 @@
+{
+  "name": "travel-project",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  }
+}
