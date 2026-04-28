@@ -5,17 +5,13 @@
 
 ---
 
-### TICKET-001 — Bootstrap monorepo + token system + global styles
-
-**Why**: Every other ticket depends on the design token CSS variables and the project scaffold existing.
-
-**Scope**:
-
 ### TICKET-002 — Shimmer skeleton system + LoadingPill primitive
 
 **Why**: Loading states appear on every screen; building the primitives once means every subsequent ticket can just import them.
 
 **Scope**:
+- Add shimmer keyframes and `.skeleton-shimmer` / `.skeleton-shimmer-dark` classes to `theme.css` — copy the exact CSS from `SPEC.md §4.5` verbatim.
+- Add `@media (prefers-reduced-motion: reduce)` override that replaces the animation with a static `--grey-100` fill.
 - Create `src/app/components/Skeleton.tsx` exporting: `Skeleton` (base shimmer block, accepts `width`, `height`, `borderRadius`, `className`), `RouteCardSkeleton` (44×44 shimmer tile + two bars + trailing pill), `StopRowSkeleton` (grey-300 ring + connector + variable bar), `LoadingPill` (white rounded-full pill, small green spinner left, "Loading route data…" text, `role="status" aria-live="polite"`).
 - Create a minimal `/dev` stub page at `app/dev/page.tsx` that renders one of each skeleton variant with a label, so the team can visually verify them.
 
