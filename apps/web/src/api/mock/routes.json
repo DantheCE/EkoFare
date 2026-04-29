@@ -1,0 +1,200 @@
+[
+  {
+    "id": 1,
+    "name": "CMS → Obalende → Lekki Phase 1",
+    "vehicle": "danfo",
+    "type": "island-loop",
+    "duration": 55,
+    "icon": "danfo",
+    "color": "#F4B41A",
+    "confirmations": 12,
+    "isVerified": true,
+    "stops": [
+      { "name": "CMS (Lagos Island)",     "legFare": 0    },
+      { "name": "Obalende",               "legFare": 200  },
+      { "name": "Lekki Phase 1",          "legFare": 400  }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Oshodi → CMS",
+    "vehicle": "brt",
+    "type": "mainland-island",
+    "duration": 40,
+    "icon": "brt",
+    "color": "#1E88E5",
+    "confirmations": 9,
+    "isVerified": true,
+    "stops": [
+      { "name": "Oshodi Terminal",        "legFare": 0    },
+      { "name": "Mile 2",                 "legFare": 150  },
+      { "name": "Costain",                "legFare": 150  },
+      { "name": "CMS (Lagos Island)",     "legFare": 200  }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Yaba → Surulere",
+    "vehicle": "keke",
+    "type": "local",
+    "duration": 18,
+    "icon": "keke",
+    "color": "#E53935",
+    "confirmations": 6,
+    "isVerified": true,
+    "stops": [
+      { "name": "Yaba Bus Stop",          "legFare": 0    },
+      { "name": "National Stadium",       "legFare": 150  },
+      { "name": "Surulere",               "legFare": 100  }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Ikeja → Agege",
+    "vehicle": "okada",
+    "type": "local",
+    "duration": 20,
+    "icon": "okada",
+    "color": "#FB8C00",
+    "confirmations": 4,
+    "isVerified": false,
+    "stops": [
+      { "name": "Ikeja Along",            "legFare": 0    },
+      { "name": "Oko-Oba",                "legFare": 300  },
+      { "name": "Agege",                  "legFare": 200  }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "CMS → Badagry",
+    "vehicle": "ferry",
+    "type": "waterway",
+    "duration": 90,
+    "icon": "ferry",
+    "color": "#00897B",
+    "confirmations": 7,
+    "isVerified": true,
+    "stops": [
+      { "name": "CMS Marina",             "legFare": 0    },
+      { "name": "Apapa Wharf",            "legFare": 500  },
+      { "name": "Badagry Waterfront",     "legFare": 1500 }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Lekki Phase 1 → Victoria Island",
+    "vehicle": "uber",
+    "type": "express",
+    "duration": 25,
+    "icon": "uber",
+    "color": "#1C1A18",
+    "confirmations": 15,
+    "isVerified": true,
+    "stops": [
+      { "name": "Lekki Phase 1 Gate",     "legFare": 0    },
+      { "name": "Ozumba Mbadiwe",         "legFare": 2500 },
+      { "name": "Victoria Island",        "legFare": 500  }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "Ikeja → Lagos Island",
+    "vehicle": "danfo",
+    "type": "mainland-island",
+    "duration": 60,
+    "icon": "danfo",
+    "color": "#F4B41A",
+    "confirmations": 11,
+    "isVerified": true,
+    "stops": [
+      { "name": "Ikeja Along",            "legFare": 0    },
+      { "name": "Oshodi",                 "legFare": 100  },
+      { "name": "Ojuelegba",              "legFare": 150  },
+      { "name": "CMS (Lagos Island)",     "legFare": 200  }
+    ]
+  },
+  {
+    "id": 8,
+    "name": "Ikorodu → CMS",
+    "vehicle": "brt",
+    "type": "express",
+    "duration": 75,
+    "icon": "brt",
+    "color": "#1E88E5",
+    "confirmations": 18,
+    "isVerified": true,
+    "stops": [
+      { "name": "Ikorodu Terminal",       "legFare": 0    },
+      { "name": "Ketu",                   "legFare": 200  },
+      { "name": "Maryland",               "legFare": 150  },
+      { "name": "Onipanu",                "legFare": 100  },
+      { "name": "Yaba",                   "legFare": 150  },
+      { "name": "CMS (Lagos Island)",     "legFare": 200  }
+    ]
+  },
+  {
+    "id": 9,
+    "name": "Ajah → Lekki Phase 1",
+    "vehicle": "danfo",
+    "type": "lekki-axis",
+    "duration": 35,
+    "icon": "danfo",
+    "color": "#F4B41A",
+    "confirmations": 8,
+    "isVerified": true,
+    "stops": [
+      { "name": "Ajah Market",            "legFare": 0    },
+      { "name": "Chevron",                "legFare": 200  },
+      { "name": "Lekki Phase 2",          "legFare": 150  },
+      { "name": "Lekki Phase 1",          "legFare": 100  }
+    ]
+  },
+  {
+    "id": 10,
+    "name": "Surulere → Apapa",
+    "vehicle": "keke",
+    "type": "local",
+    "duration": 30,
+    "icon": "keke",
+    "color": "#E53935",
+    "confirmations": 3,
+    "isVerified": false,
+    "stops": [
+      { "name": "Surulere Bus Stop",      "legFare": 0    },
+      { "name": "Orile",                  "legFare": 200  },
+      { "name": "Apapa",                  "legFare": 250  }
+    ]
+  },
+  {
+    "id": 11,
+    "name": "Maryland → Ojota",
+    "vehicle": "okada",
+    "type": "local",
+    "duration": 15,
+    "icon": "okada",
+    "color": "#FB8C00",
+    "confirmations": 5,
+    "isVerified": true,
+    "stops": [
+      { "name": "Maryland Bus Stop",      "legFare": 0    },
+      { "name": "Palmgrove",              "legFare": 200  },
+      { "name": "Ojota",                  "legFare": 200  }
+    ]
+  },
+  {
+    "id": 12,
+    "name": "Tarkwa Bay → CMS",
+    "vehicle": "ferry",
+    "type": "waterway",
+    "duration": 45,
+    "icon": "ferry",
+    "color": "#00897B",
+    "confirmations": 10,
+    "isVerified": true,
+    "stops": [
+      { "name": "Tarkwa Bay Beach",       "legFare": 0    },
+      { "name": "Five Cowries Terminal",  "legFare": 1000 },
+      { "name": "CMS Marina",             "legFare": 500  }
+    ]
+  }
+]
