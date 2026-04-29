@@ -7,6 +7,7 @@ export const metadata: Metadata = {
 };
 
 import Layout from "./components/Layout";
+import QueryProvider from "./components/QueryProvider";
 
 export default function RootLayout({
   children,
@@ -20,9 +21,11 @@ export default function RootLayout({
           to ensure the background is always Cream.
       */}
       <body className="min-h-full flex flex-col bg-[var(--bg-page)] text-[var(--text-primary)]">
-        <Layout>
-          {children}
-        </Layout>
+        <QueryProvider>
+          <Layout>
+            {children}
+          </Layout>
+        </QueryProvider>
       </body>
     </html>
   );
