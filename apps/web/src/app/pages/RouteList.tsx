@@ -1,23 +1,22 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Home — responsive wrapper
-// < 1024px → HomeMobile (this ticket)
-// ≥ 1024px → HomeDesktop (TICKET-006, empty slot for now)
+// RouteList — responsive wrapper
+// < 1024px → RouteListMobile (TICKET-007)
+// ≥ 1024px → RouteListDesktop (TICKET-008, empty slot for now)
 // ─────────────────────────────────────────────────────────────────────────────
 
-import HomeMobile from "./HomeMobile";
-import HomeDesktop from "./desktop/HomeDesktop";
+import RouteListMobile from "./RouteListMobile";
 
-export default function Home() {
+export default function RouteList() {
   return (
     <>
       {/* Mobile layout — visible below 1024px */}
       <div className="lg:hidden">
-        <HomeMobile />
+        <RouteListMobile />
       </div>
 
-      {/* Desktop layout — TICKET-006 will fill this */}
+      {/* Desktop layout — TICKET-008 will fill this */}
       <div className="hidden lg:block">
-        <HomeDesktop />
+        {/* RouteListDesktop coming in TICKET-008 */}
       </div>
     </>
   );
