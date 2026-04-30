@@ -1,4 +1,5 @@
 import RouteDetailMobile from "./RouteDetailMobile";
+import RouteDetailDesktop from "./desktop/RouteDetailDesktop";
 
 export default function RouteDetail({ id }: { id: string }) {
   return (
@@ -7,7 +8,7 @@ export default function RouteDetail({ id }: { id: string }) {
         <RouteDetailMobile id={id} />
       </div>
       <div className="hidden lg:block">
-        {/* Desktop layout for Route Detail will go here later */}
+        <RouteDetailDesktop id={id} />
       </div>
     </>
   );

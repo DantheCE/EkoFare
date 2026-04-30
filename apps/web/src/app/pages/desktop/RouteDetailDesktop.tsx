@@ -2,17 +2,17 @@
 
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Clock, MapPin, ArrowDownUp } from "lucide-react";
-import { useRoute } from "../../hooks/useRoutes";
-import { useStopSelection } from "../../hooks/useStopSelection";
-import { StopRowSkeleton, LoadingPill } from "../components/Skeleton";
-import { getVehicleLabel, formatDuration, calculateFare, formatFare } from "../../utils/helpers";
-import VehicleIcon from "../components/VehicleIcon";
+import { useRoute } from "../../../hooks/useRoutes";
+import { useStopSelection } from "../../../hooks/useStopSelection";
+import { StopRowSkeleton, LoadingPill } from "../../components/Skeleton";
+import { getVehicleLabel, formatDuration, calculateFare, formatFare } from "../../../utils/helpers";
+import VehicleIcon from "../../components/VehicleIcon";
 
-interface RouteDetailMobileProps {
+interface RouteDetailDesktopProps {
   id: string;
 }
 
-export default function RouteDetailMobile({ id }: RouteDetailMobileProps) {
+export default function RouteDetailDesktop({ id }: RouteDetailDesktopProps) {
   const router = useRouter();
   const { data: route, isLoading, isError, refetch } = useRoute(id);
 
@@ -31,12 +31,13 @@ export default function RouteDetailMobile({ id }: RouteDetailMobileProps) {
       <header
         style={{
           background: "var(--green-800)",
-          padding: "48px 20px 32px",
-          borderRadius: "0 0 24px 24px",
+          padding: "40px 32px",
+          borderRadius: "24px",
           color: "var(--white)",
           position: "relative",
           zIndex: 10,
           boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+          marginBottom: "40px",
         }}
       >
         <button
@@ -48,7 +49,7 @@ export default function RouteDetailMobile({ id }: RouteDetailMobileProps) {
             color: "var(--white)",
             padding: 0,
             cursor: "pointer",
-            marginBottom: "24px",
+            marginBottom: "32px",
             display: "flex",
             alignItems: "center",
           }}
@@ -58,20 +59,20 @@ export default function RouteDetailMobile({ id }: RouteDetailMobileProps) {
 
         {isLoading ? (
           <div>
-            <div style={{ width: "60%", height: "24px", background: "rgba(255,255,255,0.2)", borderRadius: "4px", marginBottom: "16px" }} />
-            <div style={{ display: "flex", gap: "8px" }}>
-              <div style={{ width: "80px", height: "28px", background: "rgba(255,255,255,0.2)", borderRadius: "9999px" }} />
-              <div style={{ width: "80px", height: "28px", background: "rgba(255,255,255,0.2)", borderRadius: "9999px" }} />
+            <div style={{ width: "60%", height: "36px", background: "rgba(255,255,255,0.2)", borderRadius: "6px", marginBottom: "20px" }} />
+            <div style={{ display: "flex", gap: "12px" }}>
+              <div style={{ width: "100px", height: "32px", background: "rgba(255,255,255,0.2)", borderRadius: "9999px" }} />
+              <div style={{ width: "100px", height: "32px", background: "rgba(255,255,255,0.2)", borderRadius: "9999px" }} />
             </div>
           </div>
         ) : route ? (
           <div>
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "16px", gap: "16px" }}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "24px", gap: "16px" }}>
               <h1
                 style={{
                   fontFamily: "Syne, sans-serif",
                   fontWeight: 800,
-                  fontSize: "24px",
+                  fontSize: "36px",
                   lineHeight: 1.2,
                   margin: 0,
                 }}
@@ -85,7 +86,7 @@ export default function RouteDetailMobile({ id }: RouteDetailMobileProps) {
                   background: "rgba(255,255,255,0.15)",
                   border: "none",
                   color: "var(--white)",
-                  padding: "8px",
+                  padding: "12px",
                   borderRadius: "50%",
                   cursor: "pointer",
                   display: "flex",
@@ -95,25 +96,25 @@ export default function RouteDetailMobile({ id }: RouteDetailMobileProps) {
                   transition: "transform 200ms ease",
                 }}
               >
-                <ArrowDownUp size={20} />
+                <ArrowDownUp size={24} />
               </button>
             </div>
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
               {/* Meta Pill: Vehicle */}
               <div
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "6px",
+                  gap: "8px",
                   background: "rgba(255,255,255,0.15)",
-                  padding: "6px 12px",
+                  padding: "8px 16px",
                   borderRadius: "9999px",
                   fontFamily: "DM Sans, sans-serif",
-                  fontSize: "13px",
+                  fontSize: "14px",
                   fontWeight: 500,
                 }}
               >
-                <VehicleIcon vehicle={route.vehicle} size={16} />
+                <VehicleIcon vehicle={route.vehicle} size={18} />
                 {getVehicleLabel(route.vehicle)}
               </div>
               {/* Meta Pill: Stops */}
@@ -121,16 +122,16 @@ export default function RouteDetailMobile({ id }: RouteDetailMobileProps) {
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "6px",
+                  gap: "8px",
                   background: "rgba(255,255,255,0.15)",
-                  padding: "6px 12px",
+                  padding: "8px 16px",
                   borderRadius: "9999px",
                   fontFamily: "DM Sans, sans-serif",
-                  fontSize: "13px",
+                  fontSize: "14px",
                   fontWeight: 500,
                 }}
               >
-                <MapPin size={14} />
+                <MapPin size={16} />
                 {route.stops.length - 1} stops
               </div>
               {/* Meta Pill: Duration */}
@@ -138,22 +139,22 @@ export default function RouteDetailMobile({ id }: RouteDetailMobileProps) {
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "6px",
+                  gap: "8px",
                   background: "rgba(255,255,255,0.15)",
-                  padding: "6px 12px",
+                  padding: "8px 16px",
                   borderRadius: "9999px",
                   fontFamily: "DM Sans, sans-serif",
-                  fontSize: "13px",
+                  fontSize: "14px",
                   fontWeight: 500,
                 }}
               >
-                <Clock size={14} />
+                <Clock size={16} />
                 ~{formatDuration(route.duration_min)}
               </div>
             </div>
           </div>
         ) : (
-          <h1 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "24px", margin: 0 }}>
+          <h1 style={{ fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "36px", margin: 0 }}>
             Route Not Found
           </h1>
         )}
@@ -164,7 +165,7 @@ export default function RouteDetailMobile({ id }: RouteDetailMobileProps) {
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div style={{ position: "relative", padding: "32px 20px" }}>
+        <div style={{ position: "relative", padding: "0 16px" }}>
           <div
             style={{
               position: "absolute",
@@ -235,7 +236,7 @@ export default function RouteDetailMobile({ id }: RouteDetailMobileProps) {
     const displayStops = isReversed ? [...route.stops].reverse() : route.stops;
 
     return (
-      <div style={{ padding: "32px 20px", display: "flex", flexDirection: "column" }}>
+      <div style={{ padding: "0 16px", display: "flex", flexDirection: "column" }}>
         {displayStops.map((stop, i) => {
           const isOrigin = originIdx === i;
           const isDest = destIdx === i;
@@ -250,19 +251,19 @@ export default function RouteDetailMobile({ id }: RouteDetailMobileProps) {
               onClick={() => handleStopTap(i)}
               style={{
                 display: "flex",
-                gap: "16px",
+                gap: "20px",
                 cursor: "pointer",
-                minHeight: "60px",
+                minHeight: "72px",
               }}
             >
               {/* Timeline Graphic */}
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "24px" }}>
                 <div
                   style={{
-                    width: "16px",
-                    height: "16px",
+                    width: "20px",
+                    height: "20px",
                     borderRadius: "50%",
-                    border: isHighlighted ? "4px solid var(--green-800)" : "2px solid var(--grey-300)",
+                    border: isHighlighted ? "5px solid var(--green-800)" : "3px solid var(--grey-300)",
                     backgroundColor: "var(--white)",
                     flexShrink: 0,
                     transition: "all 150ms ease",
@@ -272,23 +273,23 @@ export default function RouteDetailMobile({ id }: RouteDetailMobileProps) {
                 {!isLast && (
                   <div
                     style={{
-                      width: "2px",
+                      width: "3px",
                       flex: 1,
                       backgroundColor: isLineHighlighted ? "var(--green-800)" : "var(--grey-200)",
                       transition: "all 150ms ease",
-                      margin: "4px 0",
+                      margin: "6px 0",
                     }}
                   />
                 )}
               </div>
 
               {/* Stop Info */}
-              <div style={{ flex: 1, paddingBottom: "24px" }}>
+              <div style={{ flex: 1, paddingBottom: "32px" }}>
                 <p
                   style={{
                     fontFamily: "Syne, sans-serif",
                     fontWeight: isHighlighted ? 700 : 500,
-                    fontSize: "16px",
+                    fontSize: "18px",
                     color: isHighlighted ? "var(--grey-900)" : "var(--grey-600)",
                     margin: "0 0 4px 0",
                     transition: "all 150ms ease",
@@ -297,12 +298,12 @@ export default function RouteDetailMobile({ id }: RouteDetailMobileProps) {
                   {stop.name}
                 </p>
                 {isOrigin && (
-                  <span style={{ fontSize: "12px", color: "var(--green-800)", fontWeight: 700 }}>
+                  <span style={{ fontSize: "14px", color: "var(--green-800)", fontWeight: 700 }}>
                     Origin
                   </span>
                 )}
                 {isDest && (
-                  <span style={{ fontSize: "12px", color: "var(--terra-700)", fontWeight: 700 }}>
+                  <span style={{ fontSize: "14px", color: "var(--terra-700)", fontWeight: 700 }}>
                     Destination
                   </span>
                 )}
@@ -330,104 +331,82 @@ export default function RouteDetailMobile({ id }: RouteDetailMobileProps) {
     return (
       <div
         style={{
-          position: "fixed",
-          bottom: "64px",
-          left: 0,
-          right: 0,
-          padding: "16px 20px",
-          zIndex: 50,
-          pointerEvents: "none",
+          marginTop: "48px",
+          background: "var(--white)",
+          borderRadius: "16px",
+          padding: "24px 32px",
+          boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
+          border: "1px solid var(--grey-100)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
-        <div
-          style={{
-            background: "var(--white)",
-            borderRadius: "16px",
-            padding: "16px 20px",
-            boxShadow: "0 -4px 24px rgba(0,0,0,0.08)",
-            border: "1px solid var(--grey-100)",
-            display: "flex",
-            flexDirection: "column",
-            gap: "16px",
-            pointerEvents: "auto",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div>
-              <p
-                style={{
-                  fontFamily: "DM Sans, sans-serif",
-                  fontSize: "13px",
-                  color: "var(--grey-500)",
-                  margin: "0 0 4px 0",
-                }}
-              >
-                Total Fare
-              </p>
-              <p
-                style={{
-                  fontFamily: "Syne, sans-serif",
-                  fontWeight: 800,
-                  fontSize: "20px",
-                  color: "var(--green-800)",
-                  margin: 0,
-                }}
-              >
-                {formatFare(totalFare)}
-              </p>
-            </div>
-
-            <div style={{ textAlign: "right" }}>
-              <p
-                style={{
-                  fontFamily: "Syne, sans-serif",
-                  fontWeight: 600,
-                  fontSize: "14px",
-                  color: "var(--grey-900)",
-                  margin: "0 0 4px 0",
-                  maxWidth: "140px",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                {originName}
-              </p>
-              <p
-                style={{
-                  fontFamily: "DM Sans, sans-serif",
-                  fontSize: "13px",
-                  color: "var(--grey-500)",
-                  margin: 0,
-                  maxWidth: "140px",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                to {destName}
-              </p>
-            </div>
-          </div>
-          
-          <button
-            onClick={handleShareTrip}
+        <div>
+          <p
             style={{
-              background: "var(--green-800)",
-              color: "var(--white)",
-              border: "none",
-              borderRadius: "10px",
-              padding: "12px",
               fontFamily: "DM Sans, sans-serif",
-              fontSize: "15px",
-              fontWeight: 600,
-              cursor: "pointer",
-              width: "100%",
+              fontSize: "14px",
+              color: "var(--grey-500)",
+              margin: "0 0 8px 0",
             }}
           >
-            Share trip
-          </button>
+            Total Fare
+          </p>
+          <p
+            style={{
+              fontFamily: "Syne, sans-serif",
+              fontWeight: 800,
+              fontSize: "32px",
+              color: "var(--green-800)",
+              margin: 0,
+            }}
+          >
+            {formatFare(totalFare)}
+          </p>
+          
+          <div style={{ marginTop: "16px" }}>
+            <p
+              style={{
+                fontFamily: "Syne, sans-serif",
+                fontWeight: 600,
+                fontSize: "16px",
+                color: "var(--grey-900)",
+                margin: "0 0 4px 0",
+              }}
+            >
+              {originName}
+            </p>
+            <p
+              style={{
+                fontFamily: "DM Sans, sans-serif",
+                fontSize: "14px",
+                color: "var(--grey-500)",
+                margin: 0,
+              }}
+            >
+              to {destName}
+            </p>
+          </div>
         </div>
+
+        <button
+          onClick={handleShareTrip}
+          style={{
+            background: "var(--green-800)",
+            color: "var(--white)",
+            border: "none",
+            borderRadius: "10px",
+            padding: "16px 32px",
+            fontFamily: "DM Sans, sans-serif",
+            fontSize: "16px",
+            fontWeight: 600,
+            cursor: "pointer",
+            transition: "background 150ms ease",
+          }}
+        >
+          Share trip
+        </button>
       </div>
     );
   };
@@ -437,14 +416,14 @@ export default function RouteDetailMobile({ id }: RouteDetailMobileProps) {
       style={{
         background: "var(--cream)",
         minHeight: "100vh",
-        paddingBottom: "88px", // clearance above bottom nav
+        paddingBottom: "40px",
       }}
     >
-      {renderHeader()}
-      <main>{renderContent()}</main>
-      {renderFareDock()}
+      <div style={{ maxWidth: "800px", margin: "0 auto", padding: "40px" }}>
+        {renderHeader()}
+        <main>{renderContent()}</main>
+        {renderFareDock()}
+      </div>
     </div>
   );
 }
-
-
