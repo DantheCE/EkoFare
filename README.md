@@ -9,6 +9,11 @@ A public transit fare reference application for Lagos. Users can lookup fares, p
 - Save frequent routes locally (no account required)
 - Crowd-sourced fare verification and contributions
 
+## Current Status
+
+- ✅ **TICKET-009**: Route Detail Mobile implemented (Interactive timeline, Fare Dock, Reversed stops).
+- 🚧 **TICKET-010**: Route Detail Desktop (Pending).
+
 ## Tech Stack
 
 - **Frontend:** Next.js 14 (App Router), Tailwind CSS v4, Zustand

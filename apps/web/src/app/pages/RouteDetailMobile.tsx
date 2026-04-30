@@ -136,7 +136,7 @@ export default function RouteDetailMobile({ id }: RouteDetailMobileProps) {
                   fontWeight: 500,
                 }}
               >
-                <VehicleIcon vehicle={route.vehicle} size={16} color="var(--white)" />
+                <VehicleIcon vehicle={route.vehicle} size={16} />
                 {getVehicleLabel(route.vehicle)}
               </div>
               {/* Meta Pill: Stops */}
@@ -249,7 +249,7 @@ export default function RouteDetailMobile({ id }: RouteDetailMobileProps) {
       return (
         <div style={{ padding: "60px 20px", textAlign: "center" }}>
           <p style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: "18px", color: "var(--grey-700)" }}>
-            We couldn't find the route you are looking for.
+            We couldn&apos;t find the route you are looking for.
           </p>
         </div>
       );
