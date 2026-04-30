@@ -5,6 +5,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import RouteListMobile from "./RouteListMobile";
+import RouteListDesktop from "./desktop/RouteListDesktop";
 
 export default function RouteList() {
   return (
@@ -14,9 +15,9 @@ export default function RouteList() {
         <RouteListMobile />
       </div>
 
-      {/* Desktop layout — TICKET-008 will fill this */}
+      {/* Desktop layout — visible at 1024px and above */}
       <div className="hidden lg:block">
-        {/* RouteListDesktop coming in TICKET-008 */}
+        <RouteListDesktop />
       </div>
     </>
   );
