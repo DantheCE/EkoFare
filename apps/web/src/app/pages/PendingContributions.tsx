@@ -1,23 +1,26 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Contribute — responsive wrapper
-// < 1024px → ContributeMobile (TICKET-013)
-// ≥ 1024px → ContributeDesktop (TICKET-014)
+// PendingContributions — responsive wrapper
+// < 1024px → PendingContributionsMobile (TICKET-015)
+// ≥ 1024px → PendingContributionsDesktop (TICKET-016)
 // ─────────────────────────────────────────────────────────────────────────────
 
-import ContributeMobile from "./ContributeMobile";
-import ContributeDesktop from "./desktop/ContributeDesktop";
+import PendingContributionsMobile from "./PendingContributionsMobile";
 
-export default function Contribute() {
+// PendingContributionsDesktop will be wired up in TICKET-016.
+// For now we fall back to the mobile layout on all breakpoints.
+
+export default function PendingContributions() {
   return (
     <>
       {/* Mobile layout — visible below 1024px */}
       <div className="lg:hidden">
-        <ContributeMobile />
+        <PendingContributionsMobile />
       </div>
 
-      {/* Desktop layout — visible 1024px and up */}
+      {/* Desktop layout — visible 1024px and up (TICKET-016) */}
       <div className="hidden lg:block">
-        <ContributeDesktop />
+        {/* PendingContributionsDesktop placeholder until TICKET-016 ships */}
+        <PendingContributionsMobile />
       </div>
     </>
   );
