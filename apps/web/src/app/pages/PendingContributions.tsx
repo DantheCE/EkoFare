@@ -5,9 +5,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import PendingContributionsMobile from "./PendingContributionsMobile";
-
-// PendingContributionsDesktop will be wired up in TICKET-016.
-// For now we fall back to the mobile layout on all breakpoints.
+import PendingContributionsDesktop from "./desktop/PendingContributionsDesktop";
 
 export default function PendingContributions() {
   return (
@@ -19,8 +17,7 @@ export default function PendingContributions() {
 
       {/* Desktop layout — visible 1024px and up (TICKET-016) */}
       <div className="hidden lg:block">
-        {/* PendingContributionsDesktop placeholder until TICKET-016 ships */}
-        <PendingContributionsMobile />
+        <PendingContributionsDesktop />
       </div>
     </>
   );

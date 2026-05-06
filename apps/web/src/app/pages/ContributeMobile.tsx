@@ -134,7 +134,8 @@ function SuccessScreen({ onReset }: { onReset: () => void }) {
 // ContributeMobile — main form
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default function ContributeMobile() {
+export interface DevProps { isLoading?: boolean; isError?: boolean; isEmpty?: boolean; isSuccess?: boolean; isDisabled?: boolean; }
+export default function ContributeMobile({ isLoading: forceLoading, isError: forceError, isEmpty: forceEmpty, isSuccess: forceSuccess, isDisabled: forceDisabled }: DevProps = {}) {
   const {
     from, setFrom,
     to, setTo,

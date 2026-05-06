@@ -102,6 +102,23 @@ export default function DesktopSidebar() {
           Contribute
         </Link>
       </div>
+
+      {/* Dev Link */}
+      <Link 
+        href="/dev" 
+        className="mt-4 flex items-center justify-center py-2 transition-opacity hover:opacity-80"
+        style={{
+          color: "var(--grey-400)",
+          fontFamily: "DM Sans, sans-serif",
+          fontSize: "12px",
+          fontWeight: 600,
+          textTransform: "uppercase",
+          letterSpacing: "0.05em",
+        }}
+        title="Component Lab (Shift+D)"
+      >
+        ••• Dev Lab
+      </Link>
     </aside>
   );
 }

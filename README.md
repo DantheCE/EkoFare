@@ -60,3 +60,9 @@ To connect to a live backend, set this to `false` and provide the `NEXT_PUBLIC_A
 - `apps/web`: Next.js frontend application
 - `apps/api`: Express backend application
 - `packages/types`: Shared TypeScript definitions
+
+### Component Dev Lab
+
+A dedicated development lab index is available to preview every UI screen across all its states (e.g., Loading, Empty, Error) without needing to trigger actual network conditions.
+- Navigate to **`http://localhost:3000/dev`**
+- Or use the keyboard shortcut: **`Shift + D`** from anywhere in the app.

@@ -16,7 +16,8 @@ const FILTERS: { label: string; value: Filter }[] = [
   { label: "Keke", value: "keke" },
 ];
 
-export default function RouteListMobile() {
+export interface DevProps { isLoading?: boolean; isError?: boolean; isEmpty?: boolean; isSuccess?: boolean; isDisabled?: boolean; }
+export default function RouteListMobile({ isLoading: forceLoading, isError: forceError, isEmpty: forceEmpty, isSuccess: forceSuccess, isDisabled: forceDisabled }: DevProps = {}) {
   const [activeFilter, setActiveFilter] = useState<Filter>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -29,10 +30,10 @@ export default function RouteListMobile() {
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  const { data: routes, isLoading, isError, refetch } = useRoutes(
-    activeFilter,
-    debouncedSearch
-  );
+  const { data: routesQuery, isLoading: queryLoading, isError: queryError, refetch } = useRoutes(activeFilter, debouncedSearch);
+  const isLoading = forceLoading ?? queryLoading;
+  const isError = forceError ?? queryError;
+  const routes = forceEmpty ? [] : routesQuery;
 
   return (
     <div

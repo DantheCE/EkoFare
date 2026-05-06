@@ -143,7 +143,8 @@ function SuccessScreen({ onReset }: { onReset: () => void }) {
 // ContributeDesktop — main form
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default function ContributeDesktop() {
+export interface DevProps { isLoading?: boolean; isError?: boolean; isEmpty?: boolean; isSuccess?: boolean; isDisabled?: boolean; }
+export default function ContributeDesktop({ isLoading: forceLoading, isError: forceError, isEmpty: forceEmpty, isSuccess: forceSuccess, isDisabled: forceDisabled }: DevProps = {}) {
   const {
     from, setFrom,
     to, setTo,

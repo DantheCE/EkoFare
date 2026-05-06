@@ -1,38 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronDown, ChevronUp, Clock, MapPin } from "lucide-react";
+import { useState } from "react";
+import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import { toast } from "sonner";
-import { useContributions, useInvalidateContributions } from "../../hooks/useContributions";
-import { useDeviceStore } from "../../stores/deviceStore";
-import { useVerificationStore } from "../../stores/verificationStore";
-import { confirmContribution, disputeContribution } from "../../api/axios";
-import VehicleIcon from "../components/VehicleIcon";
-import type { Contribution } from "@ekofare/types";
-
-import PendingCard from "../components/PendingCard";
-
-// ─────────────────────────────────────────────────────────────────────────────
-// PendingContributionsMobile — main list view
-// ─────────────────────────────────────────────────────────────────────────────
+import { useContributions } from "../../../hooks/useContributions";
+import { useDeviceStore } from "../../../stores/deviceStore";
+import PendingCard from "../../components/PendingCard";
 
 export interface DevProps { isLoading?: boolean; isError?: boolean; isEmpty?: boolean; isSuccess?: boolean; isDisabled?: boolean; }
-export default function PendingContributionsMobile({ isLoading: forceLoading, isError: forceError, isEmpty: forceEmpty, isSuccess: forceSuccess, isDisabled: forceDisabled }: DevProps = {}) {
+export default function PendingContributionsDesktop({ isLoading: forceLoading, isError: forceError, isEmpty: forceEmpty, isSuccess: forceSuccess, isDisabled: forceDisabled }: DevProps = {}) {
   const { data: queryContribs = [], isLoading: queryLoading } = useContributions("pending");
   const isLoading = forceLoading ?? queryLoading;
   const contributions = forceEmpty ? [] : queryContribs;
   const deviceId = useDeviceStore((s) => s.deviceId);
 
-  // Local state: IDs that have been animated out (3rd confirm/dispute)
-  // We keep them removed from the list immediately after animation.
   const [removedIds, setRemovedIds] = useState<Set<string>>(new Set());
-
-  // On mount, hydrate by checking if any completed contributions should be hidden.
-  // (The React Query re-fetch handles this, but the animation-out list persists locally.)
-  useEffect(() => {
-    // Nothing to pre-seed; removedIds is just for optimistic UI removal
-  }, []);
 
   function handleAnimateOut(id: string) {
     setRemovedIds((prev) => new Set(prev).add(id));
@@ -47,47 +29,65 @@ export default function PendingContributionsMobile({ isLoading: forceLoading, is
       style={{
         background: "var(--cream)",
         minHeight: "100vh",
-        paddingBottom: "88px",
+        paddingBottom: "48px",
       }}
     >
       {/* ── Dark header ───────────────────────────────────────────────────── */}
       <header
         style={{
           background: "var(--grey-900)",
-          padding: "48px 20px 24px",
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
+          padding: "40px",
         }}
       >
-        <Link
-          href="/contribute"
-          aria-label="Back to contribute"
+        <div
           style={{
+            maxWidth: "720px",
+            margin: "0 auto",
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
-            color: "var(--white)",
-            opacity: 0.7,
-            textDecoration: "none",
+            gap: "16px",
           }}
         >
-          <ChevronLeft size={24} />
-        </Link>
-        <h1
-          style={{
-            fontFamily: "Syne, sans-serif",
-            fontWeight: 700,
-            fontSize: "24px",
-            color: "var(--white)",
-            margin: 0,
-          }}
-        >
-          Pending routes
-        </h1>
+          <Link
+            href="/contribute"
+            aria-label="Back to contribute"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "var(--white)",
+              opacity: 0.7,
+              textDecoration: "none",
+              transition: "opacity 150ms ease",
+            }}
+          >
+            <ChevronLeft size={28} />
+          </Link>
+          <h1
+            style={{
+              fontFamily: "Syne, sans-serif",
+              fontWeight: 700,
+              fontSize: "30px",
+              color: "var(--white)",
+              margin: 0,
+            }}
+          >
+            Pending routes
+          </h1>
+        </div>
       </header>
 
-      <div style={{ padding: "24px 16px", display: "flex", flexDirection: "column", gap: "12px" }}>
+      {/* ── Centred content panel ─────────────────────────────────────────── */}
+      <div
+        style={{
+          maxWidth: "720px",
+          margin: "0 auto",
+          padding: "40px 40px 0",
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
+        }}
+      >
         {/* ── Loading skeleton ──────────────────────────────────────────── */}
         {isLoading && (
           <>

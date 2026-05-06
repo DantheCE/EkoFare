@@ -115,9 +115,12 @@ function RecentlyViewedRow({
   );
 }
 
-export default function HomeDesktop() {
+export interface DevProps { isLoading?: boolean; isError?: boolean; isEmpty?: boolean; isSuccess?: boolean; isDisabled?: boolean; }
+export default function HomeDesktop({ isLoading: forceLoading, isError: forceError, isEmpty: forceEmpty, isSuccess: forceSuccess, isDisabled: forceDisabled }: DevProps = {}) {
   const [activeFilter, setActiveFilter] = useState<Filter>("all");
-  const { data: routes, isLoading } = useRoutes(activeFilter);
+  const { data: routesQuery, isLoading: queryLoading } = useRoutes(activeFilter);
+  const isLoading = forceLoading ?? queryLoading;
+  const routes = forceEmpty ? [] : routesQuery;
 
   const greeting = getGreetingWithName();
   const popularRoutes = routes?.slice(0, 4) ?? [];

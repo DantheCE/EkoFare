@@ -6,7 +6,8 @@ import Link from "next/link";
 import { useSavedRoutesStore } from "../../stores/savedRoutesStore";
 import RouteCard from "../components/RouteCard";
 
-export default function SavedMobile() {
+export interface DevProps { isLoading?: boolean; isError?: boolean; isEmpty?: boolean; isSuccess?: boolean; isDisabled?: boolean; }
+export default function SavedMobile({ isLoading: forceLoading, isError: forceError, isEmpty: forceEmpty, isSuccess: forceSuccess, isDisabled: forceDisabled }: DevProps = {}) {
   const savedRoutesMap = useSavedRoutesStore((state) => state.savedRoutes);
   const savedRoutes = Object.values(savedRoutesMap);
 
