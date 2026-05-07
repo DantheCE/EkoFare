@@ -6,6 +6,7 @@ import type { VehicleType } from "@ekofare/types";
 import { useRoutes } from "../../../hooks/useRoutes";
 import RouteCard from "../../components/RouteCard";
 import { RouteCardSkeleton } from "../../components/Skeleton";
+import { useRouter } from "next/navigation";
 
 type Filter = "all" | VehicleType;
 
@@ -18,6 +19,7 @@ const FILTERS: { label: string; value: Filter }[] = [
 
 export interface DevProps { isLoading?: boolean; isError?: boolean; isEmpty?: boolean; isSuccess?: boolean; isDisabled?: boolean; }
 export default function RouteListDesktop({ isLoading: forceLoading, isError: forceError, isEmpty: forceEmpty, isSuccess: forceSuccess, isDisabled: forceDisabled }: DevProps = {}) {
+  const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<Filter>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -263,7 +265,11 @@ export default function RouteListDesktop({ isLoading: forceLoading, isError: for
               }}
             >
               {routes.map((route) => (
-                <RouteCard key={route.id} route={route} />
+                <RouteCard 
+                  key={route.id} 
+                  route={route} 
+                  onClick={() => router.push(`/fare-summary/${route.id}?origin=0&dest=${route.stops.length - 1}&reversed=0`)}
+                />
               ))}
             </div>
           )}

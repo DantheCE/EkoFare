@@ -7,6 +7,7 @@ import { useRoutes } from "../../hooks/useRoutes";
 import RouteCard from "../components/RouteCard";
 import { RouteCardSkeleton, Skeleton } from "../components/Skeleton";
 import { getGreetingWithName } from "../../utils/helpers";
+import { useRouter } from "next/navigation";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -89,6 +90,7 @@ function RecentlyViewedRow({
 
 export interface DevProps { isLoading?: boolean; isError?: boolean; isEmpty?: boolean; isSuccess?: boolean; isDisabled?: boolean; }
 export default function HomeMobile({ isLoading: forceLoading, isError: forceError, isEmpty: forceEmpty, isSuccess: forceSuccess, isDisabled: forceDisabled }: DevProps = {}) {
+  const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<Filter>("all");
   const { data: routesQuery, isLoading: queryLoading } = useRoutes(activeFilter);
   const isLoading = forceLoading ?? queryLoading;
@@ -323,7 +325,11 @@ export default function HomeMobile({ isLoading: forceLoading, isError: forceErro
         {!isLoading && popularRoutes.length > 0 && (
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             {popularRoutes.map((route) => (
-              <RouteCard key={route.id} route={route} />
+              <RouteCard 
+                key={route.id} 
+                route={route} 
+                onClick={() => router.push(`/fare-summary/${route.id}?origin=0&dest=${route.stops.length - 1}&reversed=0`)}
+              />
             ))}
           </div>
         )}

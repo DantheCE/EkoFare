@@ -5,9 +5,11 @@ import { Heart } from "lucide-react";
 import Link from "next/link";
 import { useSavedRoutesStore } from "../../stores/savedRoutesStore";
 import RouteCard from "../components/RouteCard";
+import { useRouter } from "next/navigation";
 
 export interface DevProps { isLoading?: boolean; isError?: boolean; isEmpty?: boolean; isSuccess?: boolean; isDisabled?: boolean; }
 export default function SavedMobile({ isLoading: forceLoading, isError: forceError, isEmpty: forceEmpty, isSuccess: forceSuccess, isDisabled: forceDisabled }: DevProps = {}) {
+  const router = useRouter();
   const savedRoutesMap = useSavedRoutesStore((state) => state.savedRoutes);
   const savedRoutes = Object.values(savedRoutesMap);
 
@@ -139,7 +141,11 @@ export default function SavedMobile({ isLoading: forceLoading, isError: forceErr
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             {savedRoutes.map((route) => (
-              <RouteCard key={route.id} route={route} />
+              <RouteCard 
+                key={route.id} 
+                route={route} 
+                onClick={() => router.push(`/fare-summary/${route.id}?origin=0&dest=${route.stops.length - 1}&reversed=0`)}
+              />
             ))}
           </div>
         )}
