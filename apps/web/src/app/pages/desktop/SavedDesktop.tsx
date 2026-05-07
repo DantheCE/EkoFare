@@ -8,7 +8,7 @@ import RouteCard from "../../components/RouteCard";
 import { useRouter } from "next/navigation";
 
 export interface DevProps { isLoading?: boolean; isError?: boolean; isEmpty?: boolean; isSuccess?: boolean; isDisabled?: boolean; }
-export default function SavedDesktop({ isLoading: forceLoading, isError: forceError, isEmpty: forceEmpty }: DevProps = {}) {
+export default function SavedDesktop() {
   const router = useRouter();
   const savedRoutesMap = useSavedRoutesStore((state) => state.savedRoutes);
   const savedRoutes = Object.values(savedRoutesMap);
