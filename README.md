@@ -11,8 +11,20 @@ A public transit fare reference application for Lagos. Users can lookup fares, p
 
 ## Current Status
 
-- ✅ **TICKET-009**: Route Detail Mobile implemented (Interactive timeline, Fare Dock, Reversed stops).
-- 🚧 **TICKET-010**: Route Detail Desktop (Pending).
+The frontend application is largely complete, featuring a robust mock-mode environment and distinct mobile and desktop layouts for all screens.
+
+Implemented features include:
+- Home and Route List screens for all platforms.
+- Route Detail screens with interactive timelines and fare docks.
+- Fare Summary screen for leg-by-leg fare calculation.
+- Saved Routes functionality using persistent local storage.
+- Contribute Route form featuring an origin chip and live total calculator.
+- Pending Contributions queue with device-based voting verification logic.
+
+Pending work includes:
+- Development of a developer index page to preview all UI states.
+- A comprehensive accessibility audit and compliance pass.
+- Final API integration to toggle between mock mode and a live backend.
 
 ## Tech Stack
 
