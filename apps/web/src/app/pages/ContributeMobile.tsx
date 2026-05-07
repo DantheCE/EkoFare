@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { Plus, X, Check, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import VehicleIcon from "../components/VehicleIcon";
-import { submitContribution } from "../../api/axios";
 import { useContributeForm } from "../../hooks/useContributeForm";
 import type { VehicleType } from "@ekofare/types";
 
@@ -134,8 +132,7 @@ function SuccessScreen({ onReset }: { onReset: () => void }) {
 // ContributeMobile — main form
 // ─────────────────────────────────────────────────────────────────────────────
 
-export interface DevProps { isLoading?: boolean; isError?: boolean; isEmpty?: boolean; isSuccess?: boolean; isDisabled?: boolean; }
-export default function ContributeMobile({ isLoading: forceLoading, isError: forceError, isEmpty: forceEmpty, isSuccess: forceSuccess, isDisabled: forceDisabled }: DevProps = {}) {
+export default function ContributeMobile() {
   const {
     from, setFrom,
     to, setTo,

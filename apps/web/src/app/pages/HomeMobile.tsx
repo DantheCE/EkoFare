@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Mic, Search, ArrowRight } from "lucide-react";
+import Link from "next/link";
 import type { VehicleType } from "@ekofare/types";
 import { useRoutes } from "../../hooks/useRoutes";
 import RouteCard from "../components/RouteCard";
@@ -89,7 +90,7 @@ function RecentlyViewedRow({
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface DevProps { isLoading?: boolean; isError?: boolean; isEmpty?: boolean; isSuccess?: boolean; isDisabled?: boolean; }
-export default function HomeMobile({ isLoading: forceLoading, isError: forceError, isEmpty: forceEmpty, isSuccess: forceSuccess, isDisabled: forceDisabled }: DevProps = {}) {
+export default function HomeMobile({ isLoading: forceLoading, isEmpty: forceEmpty }: DevProps = {}) {
   const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<Filter>("all");
   const { data: routesQuery, isLoading: queryLoading } = useRoutes(activeFilter);
@@ -257,7 +258,7 @@ export default function HomeMobile({ isLoading: forceLoading, isError: forceErro
           >
             Popular Routes
           </h2>
-          <a
+          <Link
             href="/routes"
             style={{
               fontFamily: "DM Sans, sans-serif",
@@ -274,7 +275,7 @@ export default function HomeMobile({ isLoading: forceLoading, isError: forceErro
             }}
           >
             See all <ArrowRight size={13} />
-          </a>
+          </Link>
         </div>
 
         {/* Loading state */}

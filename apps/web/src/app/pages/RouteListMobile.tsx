@@ -18,7 +18,7 @@ const FILTERS: { label: string; value: Filter }[] = [
 ];
 
 export interface DevProps { isLoading?: boolean; isError?: boolean; isEmpty?: boolean; isSuccess?: boolean; isDisabled?: boolean; }
-export default function RouteListMobile({ isLoading: forceLoading, isError: forceError, isEmpty: forceEmpty, isSuccess: forceSuccess, isDisabled: forceDisabled }: DevProps = {}) {
+export default function RouteListMobile({ isLoading: forceLoading, isError: forceError, isEmpty: forceEmpty }: DevProps = {}) {
   const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<Filter>("all");
   const [searchTerm, setSearchTerm] = useState("");
