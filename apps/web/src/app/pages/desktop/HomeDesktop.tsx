@@ -195,7 +195,7 @@ export default function HomeDesktop({ isLoading: forceLoading, isError: forceErr
               marginBottom: "32px",
             }}
           >
-            <Search size={20} color="var(--grey-500)" />
+            <Search size={20} color="var(--grey-300)" />
             <input
               id="home-desktop-search-input"
               type="search"
@@ -218,7 +218,7 @@ export default function HomeDesktop({ isLoading: forceLoading, isError: forceErr
                 border: "none",
                 padding: "8px",
                 cursor: "pointer",
-                color: "var(--grey-500)",
+                color: "var(--grey-300)",
                 display: "flex",
                 alignItems: "center",
               }}

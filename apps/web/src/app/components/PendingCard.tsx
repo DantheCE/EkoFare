@@ -377,7 +377,8 @@ export default function PendingCard({ contribution, deviceId, onAnimateOut }: Pe
               disabled={voting}
               style={{
                 flex: 1,
-                padding: "12px 16px",
+                padding: "0 16px",
+                minHeight: "44px",
                 borderRadius: "10px",
                 background: "var(--green-800)",
                 color: "var(--white)",
@@ -399,7 +400,8 @@ export default function PendingCard({ contribution, deviceId, onAnimateOut }: Pe
               disabled={voting}
               style={{
                 flex: 1,
-                padding: "12px 16px",
+                padding: "0 16px",
+                minHeight: "44px",
                 borderRadius: "10px",
                 background: "transparent",
                 color: "var(--grey-700)",

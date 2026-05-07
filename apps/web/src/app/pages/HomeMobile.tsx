@@ -156,7 +156,7 @@ export default function HomeMobile({ isLoading: forceLoading, isError: forceErro
             height: "52px",
           }}
         >
-          <Search size={18} color="var(--grey-500)" />
+          <Search size={18} color="var(--grey-300)" />
           <input
             id="home-search-input"
             type="search"
@@ -177,9 +177,10 @@ export default function HomeMobile({ isLoading: forceLoading, isError: forceErro
             style={{
               background: "none",
               border: "none",
-              padding: "4px",
+              padding: "13px",
+              margin: "-9px",
               cursor: "pointer",
-              color: "var(--grey-500)",
+              color: "var(--grey-300)",
               display: "flex",
               alignItems: "center",
             }}
@@ -211,7 +212,10 @@ export default function HomeMobile({ isLoading: forceLoading, isError: forceErro
               onClick={() => setActiveFilter(value)}
               style={{
                 flexShrink: 0,
-                padding: "8px 18px",
+                padding: "0 18px",
+                minHeight: "44px",
+                display: "flex",
+                alignItems: "center",
                 borderRadius: "9999px",
                 border: isActive
                   ? "1.5px solid var(--green-800)"
@@ -263,6 +267,9 @@ export default function HomeMobile({ isLoading: forceLoading, isError: forceErro
               textDecoration: "none",
               display: "flex",
               alignItems: "center",
+              justifyContent: "center",
+              minHeight: "44px",
+              minWidth: "44px",
               gap: "4px",
             }}
           >
@@ -399,7 +406,8 @@ export default function HomeMobile({ isLoading: forceLoading, isError: forceErro
                 background: "rgba(255,255,255,0.2)",
                 border: "1px solid rgba(255,255,255,0.35)",
                 borderRadius: "10px",
-                padding: "8px 16px",
+                padding: "0 16px",
+                minHeight: "44px",
                 fontFamily: "DM Sans, sans-serif",
                 fontSize: "13px",
                 fontWeight: 500,

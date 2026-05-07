@@ -146,9 +146,10 @@ export default function RouteCard({ route, onClick }: RouteCardProps) {
           style={{
             background: "none",
             border: "none",
-            padding: "4px",
+            padding: "13px",
+            margin: "-9px",
             cursor: "pointer",
-            color: saved ? "var(--terra-700)" : "var(--grey-300)",
+            color: saved ? "var(--terra-700)" : "var(--grey-500)",
             transition: "color 150ms ease, transform 150ms ease",
             display: "flex",
             alignItems: "center",
@@ -163,7 +164,7 @@ export default function RouteCard({ route, onClick }: RouteCardProps) {
           onMouseLeave={(e) => {
             (e.currentTarget as HTMLElement).style.color = saved
               ? "var(--terra-700)"
-              : "var(--grey-300)";
+              : "var(--grey-500)";
             (e.currentTarget as HTMLElement).style.transform = "scale(1)";
           }}
           onFocus={(e) => {

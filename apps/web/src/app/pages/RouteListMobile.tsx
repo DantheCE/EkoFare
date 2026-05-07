@@ -94,7 +94,8 @@ export default function RouteListMobile({ isLoading: forceLoading, isError: forc
               style={{
                 background: "none",
                 border: "none",
-                padding: "4px",
+                padding: "13px",
+                margin: "-9px",
                 cursor: "pointer",
                 color: "var(--grey-500)",
                 display: "flex",
@@ -126,7 +127,10 @@ export default function RouteListMobile({ isLoading: forceLoading, isError: forc
               onClick={() => setActiveFilter(value)}
               style={{
                 flexShrink: 0,
-                padding: "8px 18px",
+                padding: "0 18px",
+                minHeight: "44px",
+                display: "flex",
+                alignItems: "center",
                 borderRadius: "9999px",
                 border: isActive
                   ? "1.5px solid var(--green-800)"
@@ -185,7 +189,8 @@ export default function RouteListMobile({ isLoading: forceLoading, isError: forc
                 color: "var(--white)",
                 border: "none",
                 borderRadius: "10px",
-                padding: "10px 20px",
+                padding: "0 20px",
+                minHeight: "44px",
                 fontFamily: "DM Sans, sans-serif",
                 fontSize: "14px",
                 fontWeight: 600,
