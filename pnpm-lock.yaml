@@ -50,9 +50,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@ekofare/types':
-        specifier: workspace:*
-        version: link:../../packages/types
       '@tanstack/react-query':
         specifier: ^5.100.6
         version: 5.100.6(react@19.2.4)

@@ -12,7 +12,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ekofare/types": "workspace:*",
     "@tanstack/react-query": "^5.100.6",
     "axios": "^1.15.2",
     "framer-motion": "^12.4.2",
