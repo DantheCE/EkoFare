@@ -1,6 +1,10 @@
-import FareSummary from "../../../../pages/FareSummary";
+import ComingSoon from '../../../components/ComingSoon';
 
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  return <FareSummary id={id} />;
+export default async function FarePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  await params;
+  return <ComingSoon title="Fare Ticket" />;
 }

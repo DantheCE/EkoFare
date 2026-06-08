@@ -1,56 +1,63 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Bus, Search, BookmarkCheck, PlusCircle } from "lucide-react";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Bus, Search, Bookmark, Plus } from 'lucide-react';
 
-const NAV_ITEMS = [
-  { label: "Routes", href: "/", icon: Bus },
-  { label: "Search", href: "/routes", icon: Search },
-  { label: "Saved", href: "/saved", icon: BookmarkCheck },
-  { label: "Contribute", href: "/contribute", icon: PlusCircle },
+// ─────────────────────────────────────────────────────────────────────────────
+// BottomNav (Spec §6.6). 4 tabs: Routes, Search, Saved, Add. Active = yellow
+// icon tile + yellow label; inactive = ink-4 tile + faint label. ink-2 bar,
+// top border, safe-area bottom padding. ≥44px targets.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const TABS = [
+  { label: 'Routes', href: '/', icon: Bus, match: (p: string) => p === '/' || p.startsWith('/routes') },
+  { label: 'Search', href: '/search', icon: Search, match: (p: string) => p.startsWith('/search') },
+  { label: 'Saved', href: '/saved', icon: Bookmark, match: (p: string) => p.startsWith('/saved') },
+  { label: 'Add', href: '/contribute', icon: Plus, match: (p: string) => p.startsWith('/contribute') },
 ];
 
 export default function BottomNav() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? '/';
 
   return (
-    <nav 
-      className="fixed bottom-0 left-0 right-0 h-[56px] bg-[var(--white)] border-t border-[var(--grey-100)] lg:hidden z-50 flex items-center justify-around px-2"
-      style={{ boxShadow: "var(--shadow-nav)" }}
+    <nav
+      aria-label="Primary"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-ink-2"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
-      {NAV_ITEMS.map((item) => {
-        const isActive = pathname === item.href;
-        const Icon = item.icon;
-
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className="flex flex-col items-center justify-center flex-1 h-full transition-colors"
-            aria-current={isActive ? "page" : undefined}
-          >
-            <Icon
-              size={24}
-              strokeWidth={isActive ? 2.5 : 2}
-              style={{ 
-                color: isActive ? "var(--green-800)" : "var(--grey-500)" 
-              }}
-            />
-            <span
-              style={{
-                fontSize: "10px",
-                fontFamily: "DM Sans, sans-serif",
-                fontWeight: isActive ? 600 : 500,
-                color: isActive ? "var(--green-800)" : "var(--grey-500)",
-                marginTop: "2px",
-              }}
-            >
-              {item.label}
-            </span>
-          </Link>
-        );
-      })}
+      <ul className="mx-auto flex max-w-md items-stretch justify-around">
+        {TABS.map((tab) => {
+          const active = tab.match(pathname);
+          const Icon = tab.icon;
+          return (
+            <li key={tab.href} className="flex-1">
+              <Link
+                href={tab.href}
+                aria-current={active ? 'page' : undefined}
+                className="flex min-h-[56px] flex-col items-center justify-center gap-1 py-2"
+              >
+                <span
+                  className="flex h-8 w-8 items-center justify-center rounded-input transition-colors"
+                  style={{
+                    background: active ? 'var(--yellow)' : 'var(--ink-4)',
+                    color: active ? 'var(--ink)' : 'var(--faint)',
+                    borderRadius: 'var(--radius-input)',
+                  }}
+                >
+                  <Icon size={18} strokeWidth={2.2} />
+                </span>
+                <span
+                  className="text-[11px] font-semibold"
+                  style={{ color: active ? 'var(--yellow)' : 'var(--faint)' }}
+                >
+                  {tab.label}
+                </span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
     </nav>
   );
 }
