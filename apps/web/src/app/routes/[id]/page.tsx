@@ -1,10 +1,10 @@
-import ComingSoon from '../../components/ComingSoon';
+import RouteDetailClient from './RouteDetailClient';
 
 export default async function RouteDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await params;
-  return <ComingSoon title="Route Detail" />;
+  const { id } = await params;
+  return <RouteDetailClient id={id} />;
 }

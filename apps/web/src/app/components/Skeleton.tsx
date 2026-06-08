@@ -53,3 +53,46 @@ export function RouteListSkeleton({ count = 4 }: { count?: number }) {
     </div>
   );
 }
+
+/** Full Route Detail skeleton (Spec §3.9): yellow header renders instantly,
+ *  title/badges shimmer on yellow, a loading pill, then 5 stop-row skeletons. */
+export function RouteDetailSkeleton() {
+  return (
+    <div role="status" aria-label="Loading route">
+      {/* yellow header structure, instant */}
+      <div className="relative px-4 pb-6 pt-[calc(12px+env(safe-area-inset-top))]" style={{ background: 'var(--yellow)' }}>
+        <Skeleton onYellow width={120} height={14} radius={7} />
+        <div className="mt-3"><Skeleton onYellow width="70%" height={26} radius={8} /></div>
+        <div className="mt-3 flex gap-2">
+          <Skeleton onYellow width={70} height={22} radius={11} />
+          <Skeleton onYellow width={64} height={22} radius={11} />
+          <Skeleton onYellow width={58} height={22} radius={11} />
+        </div>
+      </div>
+
+      <div className="px-4">
+        <div className="mt-4"><Skeleton height={56} radius={12} /></div>
+
+        <div className="mt-5 flex items-center gap-2">
+          <span
+            className="h-4 w-4 animate-spin rounded-full border-2 border-line"
+            style={{ borderTopColor: 'var(--yellow)' }}
+          />
+          <span className="text-[13px] text-muted">Loading route data…</span>
+        </div>
+
+        <div className="mt-4 flex flex-col gap-4">
+          {[64, 52, 70, 48, 60].map((w, i) => (
+            <div key={i} className="flex gap-3">
+              <Skeleton width={20} height={20} radius={10} />
+              <div className="flex-1">
+                <Skeleton width={`${w}%`} height={16} />
+                <div className="mt-2"><Skeleton width="30%" height={12} /></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
