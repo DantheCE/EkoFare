@@ -1,5 +1,10 @@
-import ComingSoon from '../components/ComingSoon';
+import ContributeClient from './ContributeClient';
 
-export default function ContributePage() {
-  return <ComingSoon title="Add a Route" />;
+export default async function ContributePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ route?: string }>;
+}) {
+  const { route } = await searchParams;
+  return <ContributeClient prefillRouteId={route ?? null} />;
 }
