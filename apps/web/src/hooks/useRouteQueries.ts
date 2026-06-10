@@ -5,7 +5,13 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useQuery } from '@tanstack/react-query';
-import { getRoutes, getRoute, type RouteQuery } from '../lib/api/routes';
+import {
+  getRoutes,
+  getRoute,
+  searchRoutes,
+  getStopRoutes,
+  type RouteQuery,
+} from '../lib/api/routes';
 
 export function useRoutesQuery(query: RouteQuery = {}) {
   return useQuery({
@@ -21,5 +27,24 @@ export function useRouteQuery(id: string) {
     queryFn: () => getRoute(id),
     staleTime: 5 * 60 * 1000,
     enabled: Boolean(id),
+  });
+}
+
+export function useSearchQuery(q: string) {
+  const term = q.trim();
+  return useQuery({
+    queryKey: ['search', term],
+    queryFn: () => searchRoutes(term),
+    enabled: term.length > 0,
+    staleTime: 60 * 1000,
+  });
+}
+
+export function useStopRoutesQuery(name: string | null) {
+  return useQuery({
+    queryKey: ['stop-routes', name],
+    queryFn: () => getStopRoutes(name as string),
+    enabled: Boolean(name),
+    staleTime: 5 * 60 * 1000,
   });
 }
