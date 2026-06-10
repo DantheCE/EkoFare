@@ -3,6 +3,7 @@ import {
   fareBetween,
   reverseStops,
   totalFare,
+  tripSlice,
   formatFare,
   formatDuration,
   travelStopCount,
@@ -64,6 +65,22 @@ describe('reverseStops', () => {
   });
   it('preserves the end-to-end total', () => {
     expect(totalFare(rev)).toBe(totalFare(stops));
+  });
+});
+
+describe('tripSlice', () => {
+  it('re-bases the boarding stop to 0 and recomputes cumulative', () => {
+    const t = tripSlice(stops, 1, 3);
+    expect(t.map((s) => s.name)).toEqual(['Orile', 'Costain', 'National Theatre']);
+    expect(t.map((s) => s.leg_fare)).toEqual([0, 100, 100]);
+    expect(t.map((s) => s.cumulative_fare)).toEqual([0, 100, 200]);
+    expect(t.map((s) => s.order)).toEqual([0, 1, 2]);
+  });
+  it('returns the whole route for a full slice', () => {
+    expect(tripSlice(stops, 0, 4).map((s) => s.cumulative_fare)).toEqual([0, 200, 300, 400, 550]);
+  });
+  it('returns empty when destination is not after origin', () => {
+    expect(tripSlice(stops, 3, 1)).toEqual([]);
   });
 });
 

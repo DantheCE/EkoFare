@@ -36,6 +36,21 @@ export function totalFare(stops: Stop[]): number {
   return stops.reduce((sum, s) => sum + s.leg_fare, 0);
 }
 
+/**
+ * The stops for a selected trip (origin..destination inclusive), with order and
+ * cumulative_fare re-based so the boarding stop reads ₦0 (Spec §3.4 ticket).
+ * The first stop's leg_fare is forced to 0 (it is now the origin).
+ */
+export function tripSlice(stops: Stop[], originIdx: number, destIdx: number): Stop[] {
+  if (destIdx <= originIdx) return [];
+  let cum = 0;
+  return stops.slice(originIdx, destIdx + 1).map((s, i) => {
+    const leg = i === 0 ? 0 : s.leg_fare;
+    cum += leg;
+    return { ...s, order: i, leg_fare: leg, cumulative_fare: cum };
+  });
+}
+
 /** "₦550" with locale grouping. The ₦ sits in body font beside the digits. */
 export function formatFare(amount: number): string {
   return `₦${amount.toLocaleString('en-NG')}`;
