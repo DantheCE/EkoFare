@@ -1,24 +1,24 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import { routesRouter } from './routes/routes';
-import { contributionsRouter } from './routes/contributions';
+// Server entry point. Boots the Express app and wires graceful shutdown so the
+// Prisma and Redis connections close cleanly on SIGTERM/SIGINT (Railway/Render
+// send SIGTERM on deploy).
+import { createApp } from './app';
+import { env } from './lib/env';
+import { logger } from './lib/logger';
+import { prisma } from './lib/prisma';
+import { closeRedis } from './lib/redis';
 
-dotenv.config();
+const app = createApp();
 
-const app = express();
-const port = process.env.PORT || 3001;
-
-app.use(cors());
-app.use(express.json());
-
-app.use('/api/routes', routesRouter);
-app.use('/api/contributions', contributionsRouter);
-
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+const server = app.listen(env.PORT, () => {
+  logger.info(`EkoFare API listening on http://localhost:${env.PORT} (${env.NODE_ENV})`);
 });
 
-app.listen(port, () => {
-  console.log(`API running on http://localhost:${port}`);
-});
+async function shutdown(signal: string) {
+  logger.info(`${signal} received — shutting down`);
+  server.close();
+  await Promise.allSettled([prisma.$disconnect(), closeRedis()]);
+  process.exit(0);
+}
+
+process.on('SIGTERM', () => void shutdown('SIGTERM'));
+process.on('SIGINT', () => void shutdown('SIGINT'));
