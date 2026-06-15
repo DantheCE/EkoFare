@@ -1,0 +1,10 @@
+# Build output
+dist/
+
+# Env (real secrets — never commit; .env.example is the template)
+.env
+.env.local
+.env.*.local
+
+# Prisma generated client (regenerated on build)
+node_modules/.prisma/

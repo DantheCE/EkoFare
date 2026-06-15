@@ -1,0 +1,41 @@
+# Local infra for the EkoFare API (Postgres 15 + Redis 7). Brings up the exact
+# services the integration + load tests expect.
+#   pnpm --filter @ekofare/api infra:up     # docker compose up -d
+#   pnpm --filter @ekofare/api infra:down
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: ekofare-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ekofare
+    ports:
+      - '5432:5432'
+    volumes:
+      - ekofare_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d ekofare']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: ekofare-redis
+    restart: unless-stopped
+    command: ['redis-server', '--appendonly', 'yes']
+    ports:
+      - '6379:6379'
+    volumes:
+      - ekofare_redisdata:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  ekofare_pgdata:
+  ekofare_redisdata:
