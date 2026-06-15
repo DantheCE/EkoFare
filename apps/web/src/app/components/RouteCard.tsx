@@ -1,188 +1,87 @@
-"use client";
+'use client';
 
-import { Heart } from "lucide-react";
-import type { Route } from "@ekofare/types";
-import VehicleIcon from "./VehicleIcon";
-import { useSavedRoutesStore } from "../../stores/savedRoutesStore";
-import { formatFare, formatDuration, getVehicleLabel } from "../../utils/helpers";
+import Link from 'next/link';
+import { Heart } from 'lucide-react';
+import type { Route } from '../../types';
+import { totalFare, formatFare, routeMeta } from '../../lib/fare';
+import { useSavedRoutes } from '../../store/useSavedRoutes';
+import VehicleGlyph, { vehicleAccent } from './VehicleGlyph';
+import { StatusBadge } from './Badge';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// RouteCard
-// White card (14px radius, grey-100 border) used on Home, RouteList, Saved.
-// Shows: VehicleIcon · Route name · meta · total fare · heart toggle.
+// RouteCard (Spec §6.3). Whole card links to detail; the heart is an
+// independently-tappable control (stops propagation). Route name is the one
+// place truncation is allowed (single line, ellipsis). Fare uses tabular
+// figures in Plus Jakarta Sans 800 — never Danfo.
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface RouteCardProps {
-  route: Route;
-  /** Optional click handler for the card body (used on RouteList to navigate). */
-  onClick?: () => void;
-}
+export default function RouteCard({ route }: { route: Route }) {
+  const isSaved = useSavedRoutes((s) => s.isSaved(route.id));
+  const toggle = useSavedRoutes((s) => s.toggle);
+  const accent = vehicleAccent(route.vehicle);
+  const fare = totalFare(route.stops);
 
-export default function RouteCard({ route, onClick }: RouteCardProps) {
-  const { isRouteSaved, addRoute, removeRoute } = useSavedRoutesStore();
-  const saved = isRouteSaved(route.id);
-
-  const totalFare = route.stops.reduce((sum, s) => sum + s.leg_fare, 0);
-  const stopCount = route.stops.length - 1; // exclude origin from count
-
-  function handleHeartClick(e: React.MouseEvent) {
-    // Prevent the card's onClick from firing when toggling save
+  function onHeart(e: React.MouseEvent) {
+    e.preventDefault();
     e.stopPropagation();
-    if (saved) {
-      removeRoute(route.id);
-    } else {
-      addRoute(route);
-    }
+    toggle(route);
   }
 
   return (
-    <article
-      onClick={onClick}
-      style={{
-        background: "var(--white)",
-        border: "1px solid var(--grey-100)",
-        borderRadius: "14px",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-        padding: "16px",
-        display: "flex",
-        alignItems: "center",
-        gap: "12px",
-        cursor: onClick ? "pointer" : "default",
-        transition: "box-shadow 150ms ease, transform 150ms ease",
-      }}
-      onMouseEnter={(e) => {
-        if (onClick) {
-          (e.currentTarget as HTMLElement).style.boxShadow =
-            "0 4px 16px rgba(0,0,0,0.10)";
-          (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
-        }
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.boxShadow =
-          "0 2px 8px rgba(0,0,0,0.06)";
-        (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
-      }}
-      aria-label={`${route.name} route, ${formatFare(totalFare)}`}
+    <Link
+      href={`/routes/${route.id}`}
+      prefetch
+      aria-label={`${route.name}, ${formatFare(fare)} end to end`}
+      className="group relative flex items-center gap-3 overflow-hidden rounded-card border border-line bg-ink-2 p-4 transition-colors hover:bg-ink-3"
+      style={{ borderRadius: 'var(--radius-card)' }}
     >
-      {/* ── Vehicle icon tile (40×40) ── */}
-      <div
-        style={{
-          width: 44,
-          height: 44,
-          borderRadius: "10px",
-          background: "var(--off-white)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-          border: "1px solid var(--grey-100)",
-        }}
+      {/* left accent stripe by vehicle */}
+      <span
+        aria-hidden
+        className="absolute inset-y-0 left-0 w-1"
+        style={{ background: accent }}
+      />
+
+      {/* icon tile */}
+      <span
+        aria-hidden
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-input border border-line bg-ink-3"
+        style={{ borderRadius: 'var(--radius-input)' }}
       >
-        <VehicleIcon vehicle={route.vehicle} size={32} />
-      </div>
+        <VehicleGlyph vehicle={route.vehicle} />
+      </span>
 
-      {/* ── Route info (name + meta) ── */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p
-          style={{
-            fontFamily: "Syne, sans-serif",
-            fontWeight: 700,
-            fontSize: "15px",
-            color: "var(--grey-900)",
-            lineHeight: 1.3,
-            margin: 0,
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {route.name}
-        </p>
-
-        <p
-          style={{
-            fontFamily: "DM Sans, sans-serif",
-            fontWeight: 400,
-            fontSize: "13px",
-            color: "var(--grey-500)",
-            margin: "4px 0 0",
-            lineHeight: 1.4,
-          }}
-        >
-          {getVehicleLabel(route.vehicle)}
-          <span style={{ margin: "0 5px", opacity: 0.5 }}>·</span>
-          {stopCount} stop{stopCount !== 1 ? "s" : ""}
-          <span style={{ margin: "0 5px", opacity: 0.5 }}>·</span>
-          ~{formatDuration(route.duration_min)}
-        </p>
-      </div>
-
-      {/* ── Fare + Heart ── */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-end",
-          gap: "8px",
-          flexShrink: 0,
-        }}
-      >
-        <span
-          style={{
-            fontFamily: "Syne, sans-serif",
-            fontWeight: 800,
-            fontSize: "16px",
-            color: "var(--green-800)",
-            lineHeight: 1,
-          }}
-        >
-          {formatFare(totalFare)}
+      {/* body */}
+      <span className="min-w-0 flex-1">
+        <span className="flex items-center gap-2">
+          <span className="min-w-0 truncate text-[15px] font-bold text-cream">
+            {route.name}
+          </span>
+          <span className="shrink-0">
+            <StatusBadge status={route.status} />
+          </span>
         </span>
+        <span className="mt-1 block text-[13px] text-muted">
+          {routeMeta(route.vehicle, route.stops, route.duration_min)}
+        </span>
+      </span>
 
+      {/* right column: fare (top) + heart (bottom), both independently legible */}
+      <span className="flex shrink-0 flex-col items-end gap-2 self-stretch">
+        <span className="tnum text-[16px] font-extrabold leading-none text-yellow">
+          {formatFare(fare)}
+        </span>
         <button
-          onClick={handleHeartClick}
-          aria-label={saved ? `Remove ${route.name} from saved routes` : `Save ${route.name}`}
-          aria-pressed={saved}
-          style={{
-            background: "none",
-            border: "none",
-            padding: "13px",
-            margin: "-9px",
-            cursor: "pointer",
-            color: saved ? "var(--terra-700)" : "var(--grey-500)",
-            transition: "color 150ms ease, transform 150ms ease",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: "9999px",
-            outline: "none",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.color = "var(--terra-700)";
-            (e.currentTarget as HTMLElement).style.transform = "scale(1.15)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.color = saved
-              ? "var(--terra-700)"
-              : "var(--grey-500)";
-            (e.currentTarget as HTMLElement).style.transform = "scale(1)";
-          }}
-          onFocus={(e) => {
-            (e.currentTarget as HTMLElement).style.outline =
-              "2px solid var(--green-800)";
-            (e.currentTarget as HTMLElement).style.outlineOffset = "2px";
-          }}
-          onBlur={(e) => {
-            (e.currentTarget as HTMLElement).style.outline = "none";
-          }}
+          type="button"
+          onClick={onHeart}
+          aria-pressed={isSaved}
+          aria-label={isSaved ? `Remove ${route.name} from saved` : `Save ${route.name}`}
+          className="-m-2 flex h-9 w-9 items-center justify-center rounded-full p-2 transition-transform hover:scale-110"
+          style={{ color: isSaved ? 'var(--stop)' : 'var(--faint)' }}
         >
-          <Heart
-            size={18}
-            fill={saved ? "currentColor" : "none"}
-            strokeWidth={saved ? 0 : 2}
-          />
+          <Heart size={18} fill={isSaved ? 'currentColor' : 'none'} strokeWidth={isSaved ? 0 : 2} />
         </button>
-      </div>
-    </article>
+      </span>
+    </Link>
   );
 }

@@ -1,41 +1,33 @@
-import { useState, useCallback } from "react";
-import { toast } from "sonner";
+'use client';
 
-export function useStopSelection() {
-  const [originIdx, setOriginIdx] = useState<number | null>(null);
-  const [destIdx, setDestIdx] = useState<number | null>(null);
-  const [isReversed, setIsReversed] = useState(false);
+import { useCallback, useState } from 'react';
+import { type Selection, EMPTY_SELECTION, nextSelection } from '../lib/selection';
 
-  const handleStopTap = useCallback((index: number) => {
-    if (originIdx === null) {
-      setOriginIdx(index);
-      setDestIdx(null);
-    } else if (destIdx === null) {
-      if (index > originIdx) {
-        setDestIdx(index);
-      } else {
-        setOriginIdx(index);
-        setDestIdx(null);
-      }
-    } else {
-      // Both selected, reset
-      setOriginIdx(index);
-      setDestIdx(null);
-    }
-  }, [originIdx, destIdx]);
+// ─────────────────────────────────────────────────────────────────────────────
+// useStopSelection — wraps the pure selection machine with a keyboard focus
+// cursor for the StopTimeline (Spec §6.1). `length` is the stop count.
+// ─────────────────────────────────────────────────────────────────────────────
 
-  const handleReverse = useCallback(() => {
-    setIsReversed((prev) => !prev);
-    setOriginIdx(null);
-    setDestIdx(null);
-    toast("Fares may differ in reverse direction");
+export function useStopSelection(length: number) {
+  const [selection, setSelection] = useState<Selection>(EMPTY_SELECTION);
+  const [focusIdx, setFocusIdx] = useState(0);
+
+  const select = useCallback((idx: number) => {
+    setSelection((s) => nextSelection(s, idx));
+    setFocusIdx(idx);
   }, []);
 
-  return {
-    originIdx,
-    destIdx,
-    isReversed,
-    handleStopTap,
-    handleReverse,
-  };
+  const reset = useCallback(() => {
+    setSelection(EMPTY_SELECTION);
+    setFocusIdx(0);
+  }, []);
+
+  const moveFocus = useCallback(
+    (delta: number) => {
+      setFocusIdx((i) => Math.min(length - 1, Math.max(0, i + delta)));
+    },
+    [length],
+  );
+
+  return { selection, focusIdx, select, reset, moveFocus, setFocusIdx } as const;
 }

@@ -1,6 +1,10 @@
-import RouteDetail from "../../pages/RouteDetail"; // Trigger IDE re-evaluation
+import RouteDetailClient from './RouteDetailClient';
 
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+export default async function RouteDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
-  return <RouteDetail id={id} />;
+  return <RouteDetailClient id={id} />;
 }
