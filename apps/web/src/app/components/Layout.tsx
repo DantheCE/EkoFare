@@ -1,42 +1,36 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Toaster } from "sonner";
-import DesktopSidebar from "./DesktopSidebar";
-import BottomNav from "./BottomNav";
+import { Toaster } from 'sonner';
+import BottomNav from './BottomNav';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// App shell — single mobile-first responsive column (Spec: collapse the old
+// mobile/desktop split). On large screens the content stays a centred phone-
+// width column on the warm-black surface. BottomNav is fixed; main reserves
+// space for it. Toaster is the dark ink pill from Spec §6.7.
+// ─────────────────────────────────────────────────────────────────────────────
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.shiftKey && e.key.toLowerCase() === "d") {
-        e.preventDefault();
-        router.push("/dev");
-      }
-    }
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [router]);
-
   return (
-    <div className="min-h-full flex flex-col">
-      <DesktopSidebar />
-      
-      <main className="flex-1 lg:pl-64 pb-[56px] lg:pb-0">
+    <div className="min-h-dvh">
+      <main className="mx-auto w-full max-w-md pb-[calc(72px+env(safe-area-inset-bottom))]">
         {children}
       </main>
 
       <BottomNav />
-      
-      <Toaster 
-        position="top-center" 
+
+      <Toaster
+        position="bottom-center"
+        offset={88}
         toastOptions={{
           style: {
-            fontFamily: 'DM Sans, sans-serif',
-            borderRadius: '10px',
-          }
+            background: 'var(--ink)',
+            color: 'var(--cream)',
+            border: '1px solid var(--line)',
+            borderRadius: 'var(--radius-pill)',
+            fontFamily: 'var(--font-body)',
+            fontSize: '14px',
+          },
         }}
       />
     </div>

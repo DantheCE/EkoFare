@@ -1,142 +1,98 @@
-import React from 'react';
+// ─────────────────────────────────────────────────────────────────────────────
+// Skeleton primitives (Spec §3.9). Shimmer sweeps 1.5s linear on dark
+// (ink-3 → ink-4 → ink-3); under prefers-reduced-motion the sweep is disabled
+// and a static ink-3 block shows. `onYellow` swaps to the translucent-ink sweep
+// for shimmer bars on the yellow detail header.
+// ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * 1. Base Skeleton Block
- * A generic shimmering rectangle with customizable dimensions.
- */
-export const Skeleton = ({ 
-  width, 
-  height, 
-  borderRadius = '4px', 
+export function Skeleton({
+  width = '100%',
+  height = 16,
+  radius = 6,
+  onYellow = false,
   className = '',
-  variant = 'default' 
-}: { 
-  width?: string | number; 
-  height?: string | number; 
-  borderRadius?: string;
+}: {
+  width?: string | number;
+  height?: string | number;
+  radius?: number;
+  onYellow?: boolean;
   className?: string;
-  variant?: 'default' | 'dark';
-}) => {
-  const shimmerClass = variant === 'dark' ? 'skeleton-shimmer skeleton-shimmer-dark' : 'skeleton-shimmer';
-  
+}) {
   return (
-    <div 
-      className={`${shimmerClass} ${className}`}
-      style={{ 
-        width: width || '100%', 
-        height: height || '20px', 
-        borderRadius 
-      }} 
+    <div
+      aria-hidden
+      className={`${onYellow ? 'skeleton-shimmer-on-yellow' : 'skeleton-shimmer'} ${className}`}
+      style={{ width, height, borderRadius: radius }}
     />
   );
-};
+}
 
-/**
- * 2. RouteCardSkeleton
- * Matches the layout of a standard RouteCard:
- * [44x44 icon] [Two text bars] [Trailing pill]
- */
-export const RouteCardSkeleton = () => (
-  <div 
-    style={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-      gap: '16px', 
-      padding: '16px', 
-      background: 'white', 
-      borderRadius: '14px',
-      border: '1px solid var(--grey-100)',
-      marginBottom: '12px'
-    }}
-  >
-    {/* 44x44 Icon tile */}
-    <Skeleton width={44} height={44} borderRadius="10px" />
-    
-    {/* Content bars */}
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      <Skeleton width="60%" height={18} />
-      <Skeleton width="40%" height={14} />
+/** Matches RouteCard layout: [stripe] [icon tile] [two text bars] [fare]. */
+export function RouteCardSkeleton() {
+  return (
+    <div
+      className="flex items-center gap-3 rounded-card border border-line bg-ink-2 p-4"
+      style={{ borderRadius: 'var(--radius-card)' }}
+    >
+      <Skeleton width={44} height={44} radius={11} />
+      <div className="flex flex-1 flex-col gap-2">
+        <Skeleton width="62%" height={16} />
+        <Skeleton width="42%" height={12} />
+      </div>
+      <Skeleton width={56} height={20} radius={8} />
     </div>
-    
-    {/* Trailing pill */}
-    <Skeleton width={60} height={24} borderRadius="20px" />
-  </div>
-);
+  );
+}
 
-/**
- * 3. StopRowSkeleton
- * Used on the Route Detail timeline:
- * (Ring + Connector) [Text bar]
- */
-export const StopRowSkeleton = () => (
-  <div style={{ display: 'flex', gap: '16px', height: '60px' }}>
-    {/* Timeline vertical elements */}
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <div style={{ 
-        width: '12px', 
-        height: '12px', 
-        borderRadius: '50%', 
-        border: '2px solid var(--grey-300)',
-        backgroundColor: 'white'
-      }} />
-      <div style={{ 
-        flex: 1, 
-        width: '2px', 
-        backgroundColor: 'var(--grey-100)' 
-      }} />
+export function RouteListSkeleton({ count = 4 }: { count?: number }) {
+  return (
+    <div className="flex flex-col gap-3" role="status" aria-label="Loading routes">
+      {Array.from({ length: count }).map((_, i) => (
+        <RouteCardSkeleton key={i} />
+      ))}
     </div>
-    
-    {/* Stop name placeholder */}
-    <div style={{ paddingTop: '2px', flex: 1 }}>
-      <Skeleton width="120px" height={16} />
+  );
+}
+
+/** Full Route Detail skeleton (Spec §3.9): yellow header renders instantly,
+ *  title/badges shimmer on yellow, a loading pill, then 5 stop-row skeletons. */
+export function RouteDetailSkeleton() {
+  return (
+    <div role="status" aria-label="Loading route">
+      {/* yellow header structure, instant */}
+      <div className="relative px-4 pb-6 pt-[calc(12px+env(safe-area-inset-top))]" style={{ background: 'var(--yellow)' }}>
+        <Skeleton onYellow width={120} height={14} radius={7} />
+        <div className="mt-3"><Skeleton onYellow width="70%" height={26} radius={8} /></div>
+        <div className="mt-3 flex gap-2">
+          <Skeleton onYellow width={70} height={22} radius={11} />
+          <Skeleton onYellow width={64} height={22} radius={11} />
+          <Skeleton onYellow width={58} height={22} radius={11} />
+        </div>
+      </div>
+
+      <div className="px-4">
+        <div className="mt-4"><Skeleton height={56} radius={12} /></div>
+
+        <div className="mt-5 flex items-center gap-2">
+          <span
+            className="h-4 w-4 animate-spin rounded-full border-2 border-line"
+            style={{ borderTopColor: 'var(--yellow)' }}
+          />
+          <span className="text-[13px] text-muted">Loading route data…</span>
+        </div>
+
+        <div className="mt-4 flex flex-col gap-4">
+          {[64, 52, 70, 48, 60].map((w, i) => (
+            <div key={i} className="flex gap-3">
+              <Skeleton width={20} height={20} radius={10} />
+              <div className="flex-1">
+                <Skeleton width={`${w}%`} height={16} />
+                <div className="mt-2"><Skeleton width="30%" height={12} /></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
-  </div>
-);
-
-/**
- * 4. LoadingPill
- * The premium overlay pill used during full-page transitions.
- */
-export const LoadingPill = () => (
-  <div 
-    role="status" 
-    aria-live="polite"
-    style={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: '12px',
-      padding: '4px 16px',
-      background: 'white',
-      borderRadius: '9999px',
-      boxShadow: 'var(--shadow-card)',
-      border: '1px solid var(--grey-100)'
-    }}
-  >
-    {/* CSS-only Green Spinner */}
-    <div style={{
-      width: '16px',
-      height: '16px',
-      border: '2px solid var(--green-100)',
-      borderTop: '2px solid var(--green-800)',
-      borderRadius: '50%',
-      animation: 'spin 0.8s linear infinite'
-    }} />
-    
-    <span style={{ 
-      fontFamily: 'DM Sans', 
-      fontSize: '14px', 
-      fontWeight: 500, 
-      color: 'var(--grey-700)' 
-    }}>
-      Loading route data...
-    </span>
-
-    {/* Inline style for the spinner keyframe */}
-    <style>{`
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-    `}</style>
-  </div>
-);
+  );
+}

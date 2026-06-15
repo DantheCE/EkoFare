@@ -1,6 +1,13 @@
-import FareSummary from "../../../../pages/FareSummary";
+import FareTicketClient from './FareTicketClient';
 
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+export default async function FarePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ from?: string; to?: string; rev?: string }>;
+}) {
   const { id } = await params;
-  return <FareSummary id={id} />;
+  const sp = await searchParams;
+  return <FareTicketClient id={id} from={sp.from} to={sp.to} rev={sp.rev} />;
 }

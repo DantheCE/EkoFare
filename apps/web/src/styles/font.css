@@ -1,2 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400..800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Syne:wght@400..800&display=swap');
+/* Fonts (Danfo display + Plus Jakarta Sans body) are loaded via next/font in
+   app/layout.tsx, which self-hosts them and exposes --font-danfo / --font-jakarta
+   with no FOUT and no layout shift. No @import font URLs here on purpose. */

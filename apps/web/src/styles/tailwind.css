@@ -1,1 +1,64 @@
 @import "tailwindcss";
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Bridge the Danfo Board tokens (theme.css) into Tailwind v4 utilities so
+   components can write bg-ink, text-cream, text-yellow, border-line,
+   rounded-card, font-display, font-body, etc.
+   ─────────────────────────────────────────────────────────────────────────── */
+@theme inline {
+  /* surfaces */
+  --color-ink:    var(--ink);
+  --color-ink-2:  var(--ink-2);
+  --color-ink-3:  var(--ink-3);
+  --color-ink-4:  var(--ink-4);
+  --color-line:   var(--line);
+
+  /* brand + semantic */
+  --color-yellow:    var(--yellow);
+  --color-yellow-dk: var(--yellow-dk);
+  --color-go:        var(--go);
+  --color-go-dk:     var(--go-dk);
+  --color-stop:      var(--stop);
+  --color-stop-dk:   var(--stop-dk);
+
+  /* text */
+  --color-cream: var(--cream);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+
+  /* paper (tickets) */
+  --color-paper:     var(--paper);
+  --color-paper-ink: var(--paper-ink);
+  --color-paper-mut: var(--paper-mut);
+
+  /* fonts */
+  --font-display: var(--font-display);
+  --font-body:    var(--font-body);
+
+  /* radii */
+  --radius-card:    var(--radius-card);
+  --radius-card-lg: var(--radius-card-lg);
+  --radius-input:   var(--radius-input);
+  --radius-button:  var(--radius-button);
+  --radius-pill:    var(--radius-pill);
+  --radius-phone:   var(--radius-phone);
+}
+
+/* ── Base ───────────────────────────────────────────────────────────────────*/
+html, body {
+  background: var(--ink);
+  color: var(--cream);
+}
+body {
+  font-family: var(--font-body);
+  font-feature-settings: "kern" 1;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Danfo display face — wordmark, screen headers, detail route titles ONLY */
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}

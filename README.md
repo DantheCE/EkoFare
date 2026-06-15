@@ -1,181 +1,160 @@
 # EkoFare
 
-A Lagos public-transit fare reference application designed to provide commuters with accurate fare information prior to boarding. 
+A Lagos public-transit fare reference app — crowdsourced, community-verified, and designed for commuters who want to know the fare before they board.
 
 ## Overview
 
-EkoFare is a mobile-first, desktop-responsive web application addressing the common issue of inconsistent public-transit fares in Lagos. Fares frequently fluctuate based on vehicle type (Danfo, BRT, Keke, Okada, Ferry), route segment, time of day, and driver discretion. EkoFare mitigates this by crowdsourcing fare data, facilitating community verification, and establishing a canonical fare repository for origin-to-destination pairs.
+Lagos public-transit fares fluctuate by vehicle type (Danfo, BRT, Keke, Okada, Ferry, Rideshare), route segment, and driver discretion. EkoFare mitigates this by crowdsourcing fare data and requiring community verification before a route reaches "verified" status.
 
-### Core Features
+**v3.2 "Danfo Board"** — dark warm-black UI, danfo-yellow accents, mobile-first single-column layout, mock-mode-first data layer.
 
-- **Fare Lookup:** Search for routes by vehicle type, origin, or destination.
-- **Multi-Leg Trip Planning:** Calculate cumulative fares across multiple stops.
-- **Save Routes:** Access frequently used routes conveniently without requiring user account registration.
-- **Contribute:** Submit recent fare payments to assist the community.
-- **Community Verification:** Confirm or dispute pending fare contributions via a dedicated queue. Three confirmations are required to promote a route to the verified list.
+### Screens
+
+| Path | Description |
+|---|---|
+| `/` | Home — greeting, search bar, filter chips, popular routes |
+| `/routes` | All Routes — filterable and sortable route directory |
+| `/routes/:id` | Route Detail — interactive stop timeline, fare calculator |
+| `/routes/:id/fare` | Fare Ticket — boarding-pass breakdown with share/correct actions |
+| `/search` | Search — debounced stops + routes, transfer sheet, recents |
+| `/saved` | Saved Routes — persisted offline via Zustand + localStorage |
+| `/contribute` | Contribute — stop builder, validation, all server response states |
+| `/contribute/success` | Submission confirmation |
 
 ## Prerequisites
 
-| Tool       | Version  | Notes                                      |
-|------------|----------|--------------------------------------------|
-| Node.js    | >= 20    | Run `node -v` to verify version            |
-| pnpm       | >= 9     | Run `npm i -g pnpm` if not installed       |
-| PostgreSQL | >= 14    | Required only for full-stack deployment    |
+| Tool | Version | Notes |
+|---|---|---|
+| Node.js | >= 20 | Node 24 recommended (`--use-system-ca` flag available) |
+| pnpm | >= 9 | `npm i -g pnpm` |
+| PostgreSQL | >= 14 | Full-stack only; not needed for mock mode |
+
+> **Corporate proxy / custom root CA:** prefix all Node commands with `NODE_OPTIONS="--use-system-ca"` if you see `UNABLE_TO_VERIFY_LEAF_SIGNATURE` errors during `pnpm install` or `pnpm dev`.
 
 ## Getting Started
 
-### Frontend Only (Mock Mode)
+### Frontend Only (Mock Mode — recommended)
 
-This mode operates without a database, backend, or environment variables. It is the most efficient way to explore EkoFare locally.
+No database, no backend, no environment variables needed.
 
-1. Clone the repository and install dependencies:
-   ```bash
-   git clone <repo-url> && cd ekofare
-   pnpm install
-   ```
-2. Start the frontend development server:
-   ```bash
-   pnpm --filter web dev
-   ```
+```bash
+git clone <repo-url> && cd ekofare
+pnpm install
+pnpm --filter web dev
+```
 
-Navigate to `http://localhost:3000`. In this mode, routes load from mock data, contributions persist in `localStorage`, and the complete submission-to-verification workflow functions end-to-end.
+Open `http://localhost:3000`. Routes, search, and contribute all work against in-memory mock data. Contributions and saved routes persist in `localStorage`.
 
-### Full-Stack Setup (API and PostgreSQL)
+### Full-Stack Setup (API + PostgreSQL)
 
-Deploy this configuration to utilize the Express API and PostgreSQL database backend.
-
-1. Configure the API Environment:
+1. Configure the API:
    ```bash
    cp apps/api/.env.example apps/api/.env
    ```
-   Update `apps/api/.env` with appropriate credentials:
+   `apps/api/.env`:
    ```env
    DATABASE_URL=postgresql://postgres:password@localhost:5432/ekofare
    VERIFICATION_THRESHOLD=3
    PORT=3001
    ```
 
-2. Initialize the Database Schema and Seed Data:
+2. Initialise the database:
    ```bash
    pnpm --filter @ekofare/api db:push
    pnpm --filter @ekofare/api db:seed
    ```
 
-3. Start the Backend Server:
+3. Start the API:
    ```bash
    pnpm --filter @ekofare/api dev
    ```
-   The API will initialize at `http://localhost:3001`.
 
-4. Configure the Frontend Environment:
-   Create `apps/web/.env.local`:
+4. Configure the frontend (`apps/web/.env.local`):
    ```env
-   NEXT_PUBLIC_USE_MOCK=false
+   NEXT_PUBLIC_USE_MOCKS=false
    NEXT_PUBLIC_API_BASE_URL=http://localhost:3001
    ```
 
-5. Start the Frontend Server:
+5. Start the frontend:
    ```bash
    pnpm --filter web dev
    ```
-   The application will now route all requests through Axios to the Express API.
 
-## Environment Variable Reference
+## Environment Variables
 
-| Variable | Target | Default | Description |
+| Variable | App | Default | Description |
 |---|---|---|---|
-| `NEXT_PUBLIC_USE_MOCK` | `apps/web` | `true` | Set to `"false"` to utilize the Express API. When `true`, the application uses in-memory mock data. |
-| `NEXT_PUBLIC_API_BASE_URL` | `apps/web` | `http://localhost:3001` | Base URL for the Express API. Required when `NEXT_PUBLIC_USE_MOCK=false`. |
-| `DATABASE_URL` | `apps/api` | N/A | PostgreSQL connection string. |
-| `VERIFICATION_THRESHOLD` | `apps/api` | `3` | Number of community confirmations required to promote a pending contribution. |
-| `PORT` | `apps/api` | `3001` | Port designation for the Express server. |
+| `NEXT_PUBLIC_USE_MOCKS` | `apps/web` | `true` | `"false"` to route requests to the Express API |
+| `NEXT_PUBLIC_API_BASE_URL` | `apps/web` | `http://localhost:3001` | Express API base URL |
+| `DATABASE_URL` | `apps/api` | — | PostgreSQL connection string |
+| `VERIFICATION_THRESHOLD` | `apps/api` | `3` | Confirmations needed to promote a contribution |
+| `PORT` | `apps/api` | `3001` | Express server port |
 
-## Architecture and Structure
+## Architecture
 
 ```text
 ekofare/
 ├── apps/
-│   ├── web/                    (Next.js 14 App Router, Tailwind v4)
+│   ├── web/                        Next.js 16, React 19, Tailwind v4
 │   │   └── src/
-│   │       ├── app/            (UI Components and Pages)
-│   │       ├── api/            (Axios configuration and Mock Data)
-│   │       ├── stores/         (Zustand State Management)
-│   │       ├── utils/          (Helper Functions)
-│   │       └── styles/         (Theme Tokens and Configuration)
+│   │       ├── app/                Pages + screen-level components
+│   │       │   └── components/     Shared UI (RouteCard, BottomNav, Sheet, …)
+│   │       ├── lib/                Pure logic + API layer
+│   │       │   ├── fare.ts         Fare math (fareBetween, tripSlice, …)
+│   │       │   ├── selection.ts    Stop-selection state machine
+│   │       │   ├── routeView.ts    Filtering + sorting
+│   │       │   ├── contributionValidation.ts
+│   │       │   └── api/            Axios client, mock fixtures, route/contrib calls
+│   │       ├── store/              Zustand (saved routes, UI recents)
+│   │       ├── hooks/              useRouteQueries, useStopSelection, useHydrated
+│   │       ├── types/              Single source of truth for all frontend types
+│   │       └── styles/             Theme tokens (CSS vars) + Tailwind @theme
 │   │
-│   └── api/                    (Express, Prisma, PostgreSQL)
+│   └── api/                        Express, Prisma, PostgreSQL
 │       ├── src/
-│       │   ├── index.ts        (Server Entry Point)
-│       │   ├── routes/         (API Handlers)
-│       │   ├── schemas/        (Zod Validation Schemas)
-│       │   └── db/             (Prisma Client and Seeding)
+│       │   ├── index.ts            Server entry point
+│       │   └── routes/             API handlers
 │       └── prisma/
-│           └── schema.prisma   (Database Schema)
-│
-└── packages/
-    └── types/                  (Shared TypeScript Definitions)
+│           └── schema.prisma       Database schema
 ```
 
-## Application Interface
+## Testing
 
-| View | Path | Description |
-|---|---|---|
-| Home | `/` | Main landing page featuring search, popular routes, and recent activity. |
-| Route List | `/routes` | Comprehensive route directory with filtering capabilities. |
-| Route Detail | `/routes/:id` | Interactive stop timeline and specific fare calculations. |
-| Fare Summary | `/routes/:id/fare` | Detailed breakdown of trip costs and sharing options. |
-| Saved Routes | `/saved` | Repository of user-saved routes. |
-| Contribute | `/contribute` | Interface for submitting new route data. |
-| Pending | `/contribute/pending` | Community verification queue. |
+```bash
+# Unit + integration (Vitest + React Testing Library) — 48 tests
+pnpm --filter web test
 
-The interface is responsive, transitioning at the `1024px` breakpoint. Mobile devices render a bottom navigation bar, while desktop environments utilize a sidebar navigation system.
+# E2E happy paths (Playwright, mobile-chrome, mock mode) — 5 tests
+pnpm --filter web test:e2e
 
-## Component Development Environment
-
-A dedicated development route facilitates comprehensive component testing across all states and viewports.
-
-- Access the environment at `http://localhost:3000/dev` or press `Shift + D`.
-- Note: The `/dev` route includes a `noindex` directive and remains inaccessible to standard users.
-
-## Mock Mode Configuration
-
-When `NEXT_PUBLIC_USE_MOCK` is active:
-- Route data originates from `apps/web/src/api/mock/routes.json`.
-- Artificial latency (200-400ms) simulates network conditions.
-- Pending contributions are retained in `localStorage` (`ekofare.pending`).
-
-### Resetting Pending Contributions
-
-To clear the verification queue locally:
-
-Via Developer Console:
-```javascript
-localStorage.removeItem('ekofare.pending');
-location.reload();
+# Type-check
+pnpm --filter web typecheck
 ```
 
-Or remove all EkoFare local data:
+E2E tests run against a production build on port 3100 with `NEXT_PUBLIC_USE_MOCKS=true`. Playwright browser: `npx playwright install chromium`.
+
+## Tech Stack
+
+**Frontend**
+- Next.js 16 (App Router) · React 19 · TypeScript strict
+- Tailwind CSS v4 (`@theme inline`, CSS-variable tokens)
+- Fonts: Plus Jakarta Sans (body/numbers, `next/font`) · Danfo (wordmark/headers only)
+- TanStack Query v5 · Zustand v5 + persist · Axios · Framer Motion · lucide-react · sonner
+
+**Backend**
+- Express · TypeScript · Prisma ORM · PostgreSQL · Zod
+
+## Resetting Local State
+
+Clear all EkoFare data from `localStorage` (saved routes, recents, fingerprint):
+
 ```javascript
 Object.keys(localStorage)
-  .filter(key => key.startsWith('ekofare.'))
-  .forEach(key => localStorage.removeItem(key));
+  .filter(k => k.startsWith('ekofare.'))
+  .forEach(k => localStorage.removeItem(k));
 location.reload();
 ```
-
-## Technology Stack
-
-### Frontend Architecture
-- Next.js 14 (App Router), TypeScript
-- Tailwind CSS v4, CSS-variable design tokens
-- Zustand (Client State), TanStack React Query (Server State)
-- Axios, lucide-react, sonner
-- Typography: Syne, DM Sans
-
-### Backend Architecture
-- Express, TypeScript
-- Prisma ORM, PostgreSQL
-- Zod Data Validation
 
 ## License
 
-Private — Refer to project documentation for terms of use.
+Private — refer to project documentation for terms of use.
