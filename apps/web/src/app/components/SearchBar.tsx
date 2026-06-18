@@ -19,7 +19,7 @@ export default function SearchBar({
   return (
     <Link
       href={href}
-      className="flex h-12 items-center gap-3 rounded-input border border-line bg-ink-3 px-4 text-muted transition-colors hover:bg-ink-4 focus-visible:border-yellow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow"
+      className="search-field flex h-12 items-center gap-3 rounded-input border border-line bg-ink-3 px-4 text-muted transition-colors hover:bg-ink-4"
       style={{ borderRadius: 'var(--radius-input)' }}
       aria-label="Search stops or routes"
     >
