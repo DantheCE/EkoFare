@@ -1,0 +1,41 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# Render Blueprint (https://render.com/docs/blueprint-spec) for the EkoFare API.
+# Free web service. Postgres lives on Neon, Redis on Upstash — their connection
+# strings are set as the DATABASE_URL / REDIS_URL secrets in the Render dashboard
+# (sync: false = kept out of the repo). See apps/api/DEPLOY.md for the runbook.
+#
+# Note: a free web service sleeps after ~15 min idle; the first request after a
+# nap pays a cold start. On boot the API reloads its in-memory graph and rebuilds
+# the featured board, so it self-warms.
+# ──────────────────────────────────────────────────────────────────────────────
+services:
+  - type: web
+    name: ekofare-api
+    runtime: node
+    plan: free
+    region: frankfurt # closest free Render region to Lagos
+    branch: main
+    healthCheckPath: /health
+    autoDeploy: true
+    # Install the workspace (incl. devDeps for build/generate/seed), generate the
+    # Prisma client, apply migrations, seed (idempotent), then compile — all for
+    # the api package. DATABASE_URL must be reachable at build time.
+    buildCommand: >-
+      corepack enable &&
+      pnpm install --frozen-lockfile --prod=false &&
+      pnpm --filter @ekofare/api db:generate &&
+      pnpm --filter @ekofare/api db:migrate:deploy &&
+      pnpm --filter @ekofare/api db:seed &&
+      pnpm --filter @ekofare/api build
+    # node directly (not via pnpm) so Render's SIGTERM reaches the process for
+    # graceful shutdown.
+    startCommand: node apps/api/dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true # Render generates a strong secret
+      - key: DATABASE_URL
+        sync: false # set in dashboard → Neon DIRECT connection string (?sslmode=require)
+      - key: REDIS_URL
+        sync: false # set in dashboard → Upstash rediss:// URL
