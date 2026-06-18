@@ -1,20 +1,22 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// /routes (build spec §6). Phase 3 ships the two read endpoints backed by the
-// graph pathfinder:
-//   GET /routes/find?from=&to=&vehicle?  → compute the best route (showcase; the
-//        frontend does not call this, it's the Option A demonstration endpoint).
-//   GET /routes/:id                       → a dyn: computed id or a featured id.
-// Both return a bare `Route` (the frontend's GET /routes/:id contract). The list
-// + search endpoints (GET /routes, /routes/search) arrive in Phase 4.
-// IMPORTANT: /find is declared before /:id so "find" is not captured as an id.
+// /routes (build spec §6). The frontend's route surface:
+//   GET /routes?vehicle=&status=          → { routes } the board (featured)
+//   GET /routes/search?q=                 → { routes, stops } search
+//   GET /routes/find?from=&to=&vehicle?   → bare Route (Option A showcase; the
+//        frontend does not call this — it's the pathfinding demonstration)
+//   GET /routes/:id                       → bare Route (dyn: computed or featured)
+// IMPORTANT: literal paths (/find, /search) are declared before /:id so they are
+// not captured as an id.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { Router, type Request, type Response, type NextFunction } from 'express';
 import { z } from 'zod';
 import { findRoute, getRouteById } from '../services/route.service';
+import { listRoutes, searchRoutesAndStops } from '../services/featured.service';
 import { validation } from '../lib/errors';
 
 const VEHICLES = ['DANFO', 'BRT', 'KEKE', 'OKADA', 'FERRY', 'RIDESHARE'] as const;
+const STATUSES = ['FRAGMENT', 'UNVERIFIED', 'VERIFIED', 'MAJOR'] as const;
 
 const findQuery = z.object({
   from: z.string().trim().min(2, 'from is required'),
@@ -22,7 +24,36 @@ const findQuery = z.object({
   vehicle: z.enum(VEHICLES).optional(),
 });
 
+const listQuery = z.object({
+  vehicle: z.enum(VEHICLES).optional(),
+  status: z.enum(STATUSES).optional(),
+});
+
 export const routesRouter: Router = Router();
+
+// GET /routes — the board, filtered by vehicle/status.
+routesRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const parsed = listQuery.safeParse(req.query);
+    if (!parsed.success) {
+      throw validation(parsed.error.issues.map((i) => ({ field: i.path.join('.'), message: i.message })));
+    }
+    const routes = await listRoutes(parsed.data);
+    res.json({ routes });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /routes/search?q= — routes + matching stops.
+routesRouter.get('/search', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const q = typeof req.query.q === 'string' ? req.query.q : '';
+    res.json(await searchRoutesAndStops(q));
+  } catch (err) {
+    next(err);
+  }
+});
 
 routesRouter.get('/find', async (req: Request, res: Response, next: NextFunction) => {
   try {

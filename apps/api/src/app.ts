@@ -17,6 +17,7 @@ import { ApiError } from './lib/errors';
 import { env } from './lib/env';
 import { contributionsRouter } from './routes/contributions.router';
 import { routesRouter } from './routes/routes.router';
+import { stopsRouter } from './routes/stops.router';
 
 export function createApp(): Express {
   const app = express();
@@ -48,7 +49,7 @@ export function createApp(): Express {
   // ── Routers (mounted at root — no /api prefix; see header note) ─────────────
   app.use('/contributions', contributionsRouter);
   app.use('/routes', routesRouter);
-  // app.use('/stops', stopsRouter);     // Phase 4
+  app.use('/stops', stopsRouter);
   // app.use('/flags', flagsRouter);     // Phase 5
   // app.use('/admin', adminRouter);     // Phase 5
 
