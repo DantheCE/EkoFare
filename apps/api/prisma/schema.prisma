@@ -1,5 +1,12 @@
+// EkoFare — Option A (pure graph). Routes are NOT stored; they are computed
+// from stops (nodes), connections (directed edges on one vehicle), and fare
+// reports (evidence). See the backend build spec §3.
+
 generator client {
   provider = "prisma-client-js"
+  // "native" for local dev; the debian target covers the common Linux deploy
+  // platforms (Railway / Render / Fly all run Debian with OpenSSL 3).
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -7,31 +14,106 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Route {
-  id            Int      @id @default(autoincrement())
-  name          String
-  vehicle       String
-  type          String
-  duration      Int
-  icon          String
-  color         String
-  confirmations Int      @default(0)
-  isVerified    Boolean  @default(false)
-  stops         Json     // Will store BackendStop[]
-  createdAt     DateTime @default(now())
+enum Vehicle {
+  DANFO
+  BRT
+  KEKE
+  OKADA
+  FERRY
+  RIDESHARE
 }
 
-model Contribution {
-  id            String   @id @default(uuid())
-  routeId       String?
-  route_name    String
-  vehicle       String
-  stops_data    Json     // Will store { name: string; fare_from_previous: number }[]
-  notes         String?
-  status        String   @default("pending") // 'pending' | 'verified' | 'rejected'
-  confirmations Int      @default(0)
-  disputes      Int      @default(0)
-  votedBy       String[] // Array of device IDs that have voted
-  createdAt     DateTime @default(now())
-  submitted_by  String?
+// Per-edge confidence, derived from non-outlier report count.
+enum ConnStatus {
+  UNVERIFIED
+  VERIFIED
+  MAJOR
+}
+
+model Stop {
+  id              String       @id @default(cuid())
+  name            String // display: "Oshodi Bus Stop"
+  name_normalized String       @unique // "oshodi"
+  aliases         String[]     @default([]) // alt spellings users type
+  lat             Float?
+  lon             Float?
+  created_at      DateTime     @default(now())
+  outgoing        Connection[] @relation("from_stop")
+  incoming        Connection[] @relation("to_stop")
+
+  @@index([name_normalized])
+}
+
+model Connection {
+  id               String       @id @default(cuid())
+  from_stop_id     String
+  to_stop_id       String
+  vehicle          Vehicle
+  median_fare      Int // ₦, consensus price (excl. outliers)
+  fare_reports     Int          @default(0) // count of non-outlier reports
+  status           ConnStatus   @default(UNVERIFIED)
+  avg_duration_min Int?
+  last_verified    DateTime     @updatedAt
+  from_stop        Stop         @relation("from_stop", fields: [from_stop_id], references: [id], onDelete: Cascade)
+  to_stop          Stop         @relation("to_stop", fields: [to_stop_id], references: [id], onDelete: Cascade)
+  reports          FareReport[]
+
+  @@unique([from_stop_id, to_stop_id, vehicle])
+  @@index([from_stop_id, vehicle])
+  @@index([to_stop_id, vehicle])
+  @@index([vehicle, fare_reports]) // featured selection
+}
+
+model FareReport {
+  id            String     @id @default(cuid())
+  connection_id String
+  connection    Connection @relation(fields: [connection_id], references: [id], onDelete: Cascade)
+  fare          Int
+  fingerprint   String // hash(IP + UA + daily salt)
+  is_outlier    Boolean    @default(false)
+  created_at    DateTime   @default(now())
+
+  @@index([connection_id, created_at])
+  @@index([fingerprint, created_at]) // rate limiting + dedupe
+}
+
+// Precomputed popular routes (cache table; rebuilt by background job).
+model FeaturedRoute {
+  id               String   @id @default(cuid())
+  name             String // "Mile 2 → CMS"
+  vehicle          Vehicle
+  path             String[] // ordered Stop IDs
+  total_fare       Int
+  total_duration   Int?
+  min_verification Int // weakest leg's fare_reports
+  is_active        Boolean  @default(true)
+  updated_at       DateTime @updatedAt
+
+  @@index([vehicle, is_active, min_verification])
+}
+
+// Alias / merge support for disambiguation.
+model StopAlias {
+  id           String   @id @default(cuid())
+  alias_norm   String   @unique // normalized alt name
+  canonical_id String // -> Stop.id
+  created_at   DateTime @default(now())
+}
+
+model AbuseFlag {
+  id            String   @id @default(cuid())
+  connection_id String?
+  report_id     String?
+  reason        String
+  fingerprint   String
+  status        String   @default("open") // open | resolved
+  created_at    DateTime @default(now())
+
+  @@index([status, created_at])
+}
+
+model AdminUser {
+  id            String @id @default(cuid())
+  email         String @unique
+  password_hash String
 }
