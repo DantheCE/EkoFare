@@ -15,7 +15,8 @@
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "infra:up": "docker compose up -d",
-    "infra:down": "docker compose down"
+    "infra:down": "docker compose down",
+    "load": "k6 run load/load-test.k6.js"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
