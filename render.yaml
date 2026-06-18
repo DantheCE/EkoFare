@@ -19,7 +19,7 @@ services:
     autoDeploy: true
     # Only rebuild when the API (or its deps/config) changes — a frontend-only
     # commit to main is ignored, so apps/web pushes don't redeploy the API.
-    buildFilters:
+    buildFilter:
       paths:
         - apps/api/**
         - render.yaml
