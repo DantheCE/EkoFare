@@ -66,7 +66,7 @@ export default function StopBuilder({
                   {/* fare */}
                   <div className="w-[104px]">
                     <div
-                      className="flex h-11 items-center rounded-input border bg-ink-3 px-3"
+                      className="field-ring flex h-11 items-center rounded-input border bg-ink-3 px-3"
                       style={{ borderColor: fareErr ? 'var(--stop)' : 'var(--line)', borderRadius: 'var(--radius-input)', opacity: isFirst ? 0.6 : 1 }}
                     >
                       <span className="text-[14px] text-faint">₦</span>
