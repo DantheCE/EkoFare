@@ -39,7 +39,8 @@ graph LR
 - Next.js 16 (App Router, Turbopack) · React 19 · TypeScript strict
 - Tailwind CSS v4 (`@theme inline`, CSS-variable design tokens)
 - Fonts: Plus Jakarta Sans (body/numbers) · Danfo (wordmark/headers only) — both via `next/font`
-- TanStack Query v5 · Zustand v5 + persist · Axios · Framer Motion · lucide-react · sonner
+- TanStack Query v5 · Zustand v5 + persist · Axios · Framer Motion · lucide-react
+- Custom toast system (Zustand + Framer Motion) — single active toast, replace-on-new, reduced-motion aware
 
 **Backend** (Option A pure-graph model — see below)
 - Express · TypeScript strict · Prisma · PostgreSQL 15 (`pg_trgm`) · Redis 7 (ioredis)
@@ -63,6 +64,8 @@ The entire frontend was overhauled to the locked v3.2 "Danfo Board" design syste
 3. **Pure Logic Layer (`src/lib/`)**: All fare math, stop-selection state machine, route filtering/sorting, and contribution validation live as pure functions with colocated Vitest test files. Zero framework dependencies.
 
 4. **All 8 Screens Shipped**: Home, All Routes, Route Detail (interactive stop timeline + fare calculator), Fare Ticket (boarding pass with share), Search (debounced + transfer sheet + recents), Saved, Contribute (full StopBuilder + all 5 POST response states), and Contribute Success.
+
+5. **Unified Feedback System (`src/store/useToast.ts` + `components/Toaster.tsx`)**: A single-active-toast system (Zustand store + Framer Motion) replaces the earlier `sonner` dependency. One dark pill slides above the bottom nav, colour-coded by type (success/info/warn/error), auto-dismisses (~2.5s) or on tap, and replaces rather than stacks. Wired across saves, route reversal, share/copy, every contribution outcome, and query errors (no-route / offline-with-cached-data). `aria-live="polite"`, fade-only under `prefers-reduced-motion`, and a `pointer-events-none` wrapper so it never blocks the UI.
 
 ---
 
