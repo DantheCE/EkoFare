@@ -15,6 +15,7 @@ import { prisma } from './lib/prisma';
 import { pingRedis, redisReady } from './lib/redis';
 import { ApiError } from './lib/errors';
 import { env } from './lib/env';
+import { contributionsRouter } from './routes/contributions.router';
 
 export function createApp(): Express {
   const app = express();
@@ -43,12 +44,12 @@ export function createApp(): Express {
     });
   });
 
-  // ── Routers (mounted in later phases) ──────────────────────────────────────
-  // app.use('/routes', routesRouter);
-  // app.use('/stops', stopsRouter);
-  // app.use('/contributions', contributionsRouter);
-  // app.use('/flags', flagsRouter);
-  // app.use('/admin', adminRouter);
+  // ── Routers (mounted at root — no /api prefix; see header note) ─────────────
+  app.use('/contributions', contributionsRouter);
+  // app.use('/routes', routesRouter);   // Phase 3
+  // app.use('/stops', stopsRouter);     // Phase 4
+  // app.use('/flags', flagsRouter);     // Phase 5
+  // app.use('/admin', adminRouter);     // Phase 5
 
   // 404 for anything unmatched.
   app.use((req: Request, res: Response) => {
