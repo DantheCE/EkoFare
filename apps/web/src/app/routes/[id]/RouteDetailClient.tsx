@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, Heart, Clock, RotateCw } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '../../../store/useToast';
 import { useRouteQuery } from '../../../hooks/useRouteQueries';
 import { useStopSelection } from '../../../hooks/useStopSelection';
 import { reverseStops, fareBetween, formatDuration } from '../../../lib/fare';
@@ -63,8 +63,15 @@ export default function RouteDetailClient({ id }: { id: string }) {
   function onReverse() {
     setReversed((r) => !r);
     reset();
-    toast('Fares may differ in reverse direction.');
+    toast.info('Fares may differ in the reverse direction');
   }
+
+  const onToggleSave = () => {
+    const wasSaved = isSaved;
+    toggleSave(route);
+    if (wasSaved) toast.info('Removed from saved');
+    else toast.success(`${route.name} saved to your routes`);
+  };
 
   function onShare() {
     if (selection.origin === null || selection.dest === null) return;
@@ -89,7 +96,7 @@ export default function RouteDetailClient({ id }: { id: string }) {
             <ReverseToggle onReverse={onReverse} />
             <button
               type="button"
-              onClick={() => toggleSave(route)}
+              onClick={onToggleSave}
               aria-pressed={isSaved}
               aria-label={isSaved ? 'Remove from saved' : 'Save route'}
               className="flex h-9 w-9 items-center justify-center rounded-full"

@@ -20,6 +20,7 @@
   --go-dk:      #1F9B5C;
   --stop:       #FF7A45;  /* destination stop, alerts */
   --stop-dk:    #C9521F;
+  --error:      #FF5B5B;  /* error toasts */
 
   /* text on dark */
   --cream:      #F7F3E6;  /* primary text */

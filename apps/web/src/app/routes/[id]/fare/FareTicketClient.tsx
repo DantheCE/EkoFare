@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, Share2, PencilLine } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '../../../../store/useToast';
 import { useRouteQuery } from '../../../../hooks/useRouteQueries';
 import { reverseStops, tripSlice, totalFare, formatFare, formatDuration } from '../../../../lib/fare';
 import { formatRelative } from '../../../../lib/datetime';
@@ -76,8 +76,8 @@ export default function FareTicketClient({
     const text = `EkoFare — ${origin.name} → ${dest.name} by ${VEHICLE_LABEL[route!.vehicle]}: ${formatFare(fare)} per person. Check the fare before you board.`;
     const url = typeof window !== 'undefined' ? window.location.href : undefined;
     const result = await shareOrCopy({ title: 'EkoFare trip', text, url });
-    if (result === 'copied') toast('Trip summary copied to clipboard');
-    else if (result === 'failed') toast('Couldn’t share — try again');
+    if (result === 'copied') toast.success('Trip copied — paste it anywhere');
+    else if (result === 'failed') toast.error('Couldn’t share — try copying instead');
   }
 
   return (

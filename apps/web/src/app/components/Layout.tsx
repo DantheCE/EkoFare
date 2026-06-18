@@ -1,7 +1,7 @@
 'use client';
 
-import { Toaster } from 'sonner';
 import BottomNav from './BottomNav';
+import { Toaster } from './Toaster';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // App shell — single mobile-first responsive column (Spec: collapse the old
@@ -19,20 +19,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       <BottomNav />
 
-      <Toaster
-        position="bottom-center"
-        offset={88}
-        toastOptions={{
-          style: {
-            background: 'var(--ink)',
-            color: 'var(--cream)',
-            border: '1px solid var(--line)',
-            borderRadius: 'var(--radius-pill)',
-            fontFamily: 'var(--font-body)',
-            fontSize: '14px',
-          },
-        }}
-      />
+      <Toaster />
     </div>
   );
 }
