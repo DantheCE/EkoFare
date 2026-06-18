@@ -50,7 +50,7 @@ export default function SearchPage() {
           inputRef.current?.blur();
         }}
       >
-        <label className="flex h-12 flex-1 items-center gap-3 rounded-input border border-line bg-ink-3 px-4">
+        <label className="search-field flex h-12 flex-1 items-center gap-3 rounded-input border border-line bg-ink-3 px-4">
           <Search size={18} className="text-muted" aria-hidden />
           <input
             ref={inputRef}

@@ -76,6 +76,18 @@
   outline-offset: 2px;
 }
 
+/* Search affordances opt out of the offset outline (which detaches from the
+   rounded pill and only wraps the inner input). Instead the whole bar shows a
+   2px ring hugging its corners on focus. The §1.4 ring still applies elsewhere.
+   Unlayered so it reliably overrides the global rule above. */
+.search-field:focus-within {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--yellow);
+}
+.search-field :focus-visible {
+  outline: none; /* inner input/button — the container shows the ring instead */
+}
+
 /* ── Tabular figures — every fare and number (LOCKED §1.3) ───────────────────*/
 .tnum {
   font-family: var(--font-body);
