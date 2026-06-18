@@ -8,6 +8,7 @@
 // every stale computed route (no key enumeration needed).
 // ─────────────────────────────────────────────────────────────────────────────
 
+import type { FeaturedRoute } from '@prisma/client';
 import { prisma } from '../lib/prisma';
 import { env } from '../lib/env';
 import { cached } from '../lib/cache';
@@ -81,7 +82,7 @@ function findEdge(adj: Adjacency | undefined, fromId: string, toId: string): Gra
 
 /** Rebuild a PathResult from an ordered list of stop ids on one vehicle. Returns
  *  null if any leg is no longer routable (the stored featured route went stale). */
-function reconstructPath(adj: Adjacency | undefined, ids: string[]): PathResult | null {
+export function reconstructPath(adj: Adjacency | undefined, ids: string[]): PathResult | null {
   if (ids.length < 2) return null;
   const edges: GraphEdge[] = [];
   for (let i = 1; i < ids.length; i++) {
@@ -121,7 +122,16 @@ export async function getRouteById(id: string): Promise<Route> {
   const featured = await prisma.featuredRoute.findUnique({ where: { id } });
   if (!featured) throw notFound('Route not found.');
 
+  const route = hydrateFeatured(featured, graph);
+  if (!route) throw noRoute(); // featured route went stale (a leg dropped below routing)
+  return route;
+}
+
+/** Hydrate a stored FeaturedRoute against the current graph. Returns null when a
+ *  leg has dropped below the routing threshold since the row was built (the
+ *  caller decides whether that's a 404 or just a skip in a list). */
+export function hydrateFeatured(featured: FeaturedRoute, graph: RoutableGraph): Route | null {
   const path = reconstructPath(graph.byVehicle.get(featured.vehicle), featured.path);
-  if (!path) throw noRoute(); // featured route went stale (a leg dropped below routing)
+  if (!path) return null;
   return hydrateRoute(featured.id, path, featured.vehicle, graph.stopName);
 }
