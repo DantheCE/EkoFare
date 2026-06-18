@@ -17,6 +17,15 @@ services:
     branch: main
     healthCheckPath: /health
     autoDeploy: true
+    # Only rebuild when the API (or its deps/config) changes — a frontend-only
+    # commit to main is ignored, so apps/web pushes don't redeploy the API.
+    buildFilters:
+      paths:
+        - apps/api/**
+        - render.yaml
+        - pnpm-lock.yaml
+        - package.json
+        - pnpm-workspace.yaml
     # Install the workspace (incl. devDeps for build/generate/seed), generate the
     # Prisma client, apply migrations, seed (idempotent), then compile — all for
     # the api package. DATABASE_URL must be reachable at build time.
