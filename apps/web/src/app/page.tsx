@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { User, ChevronRight, RotateCw } from 'lucide-react';
+import { ChevronRight, RotateCw } from 'lucide-react';
 import Wordmark from './components/Wordmark';
 import SearchBar from './components/SearchBar';
 import FilterChips, { type VehicleFilter } from './components/FilterChips';
@@ -28,16 +28,9 @@ export default function HomePage() {
 
   return (
     <div className="px-4 pt-[calc(16px+env(safe-area-inset-top))]">
-      {/* Top bar */}
-      <header className="flex items-center justify-between">
+      {/* Top bar — Saved lives in the bottom nav, so the header is just the mark. */}
+      <header className="flex items-center">
         <Wordmark size={28} />
-        <Link
-          href="/saved"
-          aria-label="Your profile and saved routes"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-line bg-ink-3 text-muted"
-        >
-          <User size={18} />
-        </Link>
       </header>
 
       {/* Greeting + hero */}
