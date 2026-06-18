@@ -5,6 +5,7 @@ import { Heart } from 'lucide-react';
 import type { Route } from '../../types';
 import { totalFare, formatFare, routeMeta } from '../../lib/fare';
 import { useSavedRoutes } from '../../store/useSavedRoutes';
+import { toast } from '../../store/useToast';
 import VehicleGlyph, { vehicleAccent } from './VehicleGlyph';
 import { StatusBadge } from './Badge';
 
@@ -24,7 +25,10 @@ export default function RouteCard({ route }: { route: Route }) {
   function onHeart(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
+    const wasSaved = isSaved;
     toggle(route);
+    if (wasSaved) toast.info('Removed from saved');
+    else toast.success(`${route.name} saved to your routes`);
   }
 
   return (
