@@ -13,9 +13,9 @@ A crowdsourced Lagos public-transit fare reference app — know your fare before
 
 Lagos public transit has no fixed fare board. A Danfo bus, BRT, Keke Napep, or Okada ride between the same two stops can cost different amounts depending on the driver, the time of day, or traffic conditions. Commuters frequently overpay simply because they don't know the going rate.
 
-**EkoFare** solves this by acting like a community fare ledger. Commuters look up a route before boarding to see what others recently paid, and after the trip they submit what they paid to keep the data fresh. Three community confirmations are required before a fare reaches "verified" status — building a self-correcting dataset that improves with every user.
+**EkoFare** solves this by acting like a community fare ledger. Commuters look up a route before boarding to see what others recently paid, and after the trip they submit what they paid to keep the data fresh. Each fare is the **median of what the community reports**, with outliers filtered out — a self-correcting dataset that improves with every submission.
 
-The app is fully functional without a backend. All routes, search, and the contribution flow run in mock mode so anyone can experience the full product instantly — no sign-up, no database, no wait.
+The frontend is fully functional without a backend: all routes, search, and the contribution flow run in mock mode so anyone can experience the product instantly. Behind it sits a real **graph-model API** (Express + PostgreSQL + Redis) that computes routes on demand — including transfers no single person ever submitted whole.
 
 ## Technical Overview (For Software Engineers)
 
@@ -26,9 +26,11 @@ graph LR
     User([User]) -->|browse / search| Web(Next.js 16 App)
     Web -->|NEXT_PUBLIC_USE_MOCKS=true| Mock[(Mock Fixtures)]
     Web -->|NEXT_PUBLIC_USE_MOCKS=false| API(Express API)
-    API -->|Prisma ORM| DB[(PostgreSQL)]
+    API -->|Prisma| DB[("PostgreSQL — stops · connections · reports")]
+    API -->|ioredis| Redis[("Redis — route cache · rate limit · graph_version")]
+    API -.->|in-memory Dijkstra| Computed{{Computed Routes}}
     Web -->|Zustand + localStorage| Saved[Saved Routes]
-    Web -->|TanStack Query| Cache[Client Cache]
+    Web -->|TanStack Query| ClientCache[Client Cache]
 ```
 
 ### Technology Stack
@@ -39,12 +41,14 @@ graph LR
 - Fonts: Plus Jakarta Sans (body/numbers) · Danfo (wordmark/headers only) — both via `next/font`
 - TanStack Query v5 · Zustand v5 + persist · Axios · Framer Motion · lucide-react · sonner
 
-**Backend**
-- Express · TypeScript · Prisma ORM · PostgreSQL · Zod
+**Backend** (Option A pure-graph model — see below)
+- Express · TypeScript strict · Prisma · PostgreSQL 15 (`pg_trgm`) · Redis 7 (ioredis)
+- Zod validation · JWT admin auth · pino logging · in-memory Dijkstra pathfinding
+- Stampede-protected Redis cache · `node-cron`-free hourly job · `express-rate-limit`
 
 **Testing**
-- Vitest + React Testing Library (48 unit/integration tests)
-- Playwright (5 E2E happy paths, mobile-chrome, mock mode)
+- Frontend: Vitest + React Testing Library (48 tests) · Playwright (5 E2E, mock mode)
+- Backend: Vitest + Supertest (37 unit + 34 integration against real Postgres + Redis) · k6 load test
 
 ---
 
@@ -62,6 +66,21 @@ The entire frontend was overhauled to the locked v3.2 "Danfo Board" design syste
 
 ---
 
+## Backend: Option A — Pure Graph Model
+
+The API stores the transit **network as a graph, not as routes**. Three tables hold the truth: **stops** (nodes), **connections** (directed edges, one per vehicle, carrying a consensus fare), and **fare reports** (raw evidence). Every route a user sees is **computed on demand** — never stored.
+
+- **Contribution shred:** a submitted path of N stops becomes N−1 directed edges, each filing one fare report. No approval queue.
+- **Consensus:** a connection's fare is the **median of its non-outlier reports**; values beyond a sigma threshold are flagged once there's enough signal. Confidence (routable → verified → major) is derived from the clean report count.
+- **Pathfinding:** routes are found with an **in-memory Dijkstra** over a cached graph snapshot — including transfers no single contributor submitted whole (e.g. Ikeja→TBS stitched from two separately-reported legs).
+- **Caching:** computed routes serve through a **stampede-protected Redis cache** (in-process single-flight + probabilistic early refresh), invalidated by a shared `graph_version` counter so a new report silently expires stale routes across every instance.
+- **Stop normalization:** `pg_trgm` trigram matching collapses "Oshodi", "Oshodi Bus Stop", and typos onto one canonical node.
+- **Moderation:** Redis-backed rate limiting, anonymous abuse flags, and a JWT admin surface (stop-merge, fare correction, flag queue).
+
+Delivered in six green checkpoints: foundation → shred + consensus → pathfinding + cache → featured board + search → security + admin → seed + load + deploy. The headline acceptance test computes a route between two stops that **no single contribution ever spanned**.
+
+---
+
 ## Architectural Trade-offs & Design Decisions
 
 ### 1. Mock-Mode-First Data Layer
@@ -70,7 +89,7 @@ The entire frontend was overhauled to the locked v3.2 "Danfo Board" design syste
 
 ### 2. Single Frontend Contract, Decoupled from Backend Schema
 - **Trade-off:** `apps/web` maintains its own `src/types/index.ts` rather than consuming the shared `packages/types` workspace package.
-- **Why:** The legacy shared package used lowercase vehicle types and a different `Route` shape than the v3.2 spec. Maintaining a dual contract created a permanent coupling that blocked UI iteration. The frontend contract was cut free; backend reconciliation is a deferred, separate concern.
+- **Why:** The legacy shared package used lowercase vehicle types and a different `Route` shape than the v3.2 spec. Maintaining a dual contract created a permanent coupling that blocked UI iteration. The frontend contract was cut free, and the backend was **later rebuilt to satisfy it exactly** (routers mount at root, `POST /contributions` returns a superset of the locked success shape) — so the two now match without the frontend ever having been blocked.
 
 ### 3. Pure Selection State Machine
 - **Trade-off:** Stop selection (tap origin → tap destination → reverse → re-tap to reroute) is a pure function `nextSelection(state, index)` with no side effects.
@@ -102,46 +121,59 @@ Open `http://localhost:3000`. All routes, search, and the full contribute flow r
 
 > **Corporate proxy / custom root CA:** prefix commands with `NODE_OPTIONS="--use-system-ca"` if you see `UNABLE_TO_VERIFY_LEAF_SIGNATURE` during install.
 
-### Full-Stack Setup (API + PostgreSQL)
+### Full-Stack Setup (API + PostgreSQL + Redis)
 
-1. Configure the API:
+1. Start Postgres + Redis (or point at your own):
+   ```bash
+   pnpm --filter @ekofare/api infra:up    # docker-compose: Postgres 15 + Redis 7
+   ```
+
+2. Configure the API:
    ```bash
    cp apps/api/.env.example apps/api/.env
    ```
    ```env
    DATABASE_URL=postgresql://postgres:password@localhost:5432/ekofare
-   VERIFICATION_THRESHOLD=3
-   PORT=3001
+   REDIS_URL=redis://localhost:6379        # optional — cache degrades to live compute if unset
+   # JWT_SECRET=...                          # optional — enables the admin surface
    ```
 
-2. Initialise the database and start the API:
+3. Migrate, seed, and run:
    ```bash
-   pnpm --filter @ekofare/api db:push
-   pnpm --filter @ekofare/api db:seed
+   pnpm --filter @ekofare/api db:migrate
+   pnpm --filter @ekofare/api db:seed       # idempotent Lagos network
    pnpm --filter @ekofare/api dev
    ```
 
-3. Configure the frontend (`apps/web/.env.local`):
+4. Point the frontend at the API (`apps/web/.env.local`):
    ```env
    NEXT_PUBLIC_USE_MOCKS=false
    NEXT_PUBLIC_API_BASE_URL=http://localhost:3001
    ```
 
-4. Start the frontend:
+5. Start the frontend:
    ```bash
    pnpm --filter web dev
    ```
 
+### Deployment
+
+Frontend on **Vercel**; API on **Render** (free tier) with managed **Neon** Postgres and **Upstash** Redis. [`render.yaml`](render.yaml) is a one-file blueprint, and [`apps/api/DEPLOY.md`](apps/api/DEPLOY.md) is the full runbook. The cutover is a single switch: set `NEXT_PUBLIC_USE_MOCKS=false` on Vercel.
+
 ### Running Tests
 
 ```bash
-# Unit + integration (48 tests)
+# Frontend: unit + integration (48 tests)
 pnpm --filter web test
+# Frontend: E2E happy paths (5 tests, requires Chromium)
+npx playwright install chromium && pnpm --filter web test:e2e
 
-# E2E happy paths (5 tests, requires Chromium)
-npx playwright install chromium
-pnpm --filter web test:e2e
+# Backend: unit (37 tests)
+pnpm --filter @ekofare/api test
+# Backend: integration (34 tests, needs Postgres + Redis)
+pnpm --filter @ekofare/api test:int
 
-# Type-check
+# Type-check (either package)
 pnpm --filter web typecheck
+pnpm --filter @ekofare/api typecheck
 ```
