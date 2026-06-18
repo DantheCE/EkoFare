@@ -10,12 +10,15 @@ export default defineConfig({
     environment: 'node',
     include: ['src/**/*.int.test.ts'],
     fileParallelism: false,
+    setupFiles: ['src/test/setup.int.ts'],
     env: {
       NODE_ENV: 'test',
       DATABASE_URL:
         process.env.DATABASE_URL_TEST ??
         process.env.DATABASE_URL ??
         'postgresql://postgres:root@localhost:5432/ekofare_test',
+      // Admin auth secret for the security suite (dotenv won't override this).
+      JWT_SECRET: process.env.JWT_SECRET ?? 'test-jwt-secret-do-not-use-in-prod',
     },
   },
 });

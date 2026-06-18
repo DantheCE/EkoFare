@@ -14,13 +14,20 @@ import { logger } from './lib/logger';
 import { prisma } from './lib/prisma';
 import { pingRedis, redisReady } from './lib/redis';
 import { ApiError } from './lib/errors';
-import { env } from './lib/env';
+import { env, isProd } from './lib/env';
+import { contribLimiter, readLimiter } from './middleware/rateLimit';
 import { contributionsRouter } from './routes/contributions.router';
 import { routesRouter } from './routes/routes.router';
 import { stopsRouter } from './routes/stops.router';
+import { flagsRouter } from './routes/flags.router';
+import { adminRouter } from './routes/admin.router';
 
 export function createApp(): Express {
   const app = express();
+
+  // Behind a platform proxy (Railway/Render) in prod, trust the first hop so
+  // req.ip is the real client (rate limiting keys on it).
+  if (isProd) app.set('trust proxy', 1);
 
   app.use(cors());
   app.use(express.json());
@@ -47,11 +54,12 @@ export function createApp(): Express {
   });
 
   // ── Routers (mounted at root — no /api prefix; see header note) ─────────────
-  app.use('/contributions', contributionsRouter);
-  app.use('/routes', routesRouter);
-  app.use('/stops', stopsRouter);
-  // app.use('/flags', flagsRouter);     // Phase 5
-  // app.use('/admin', adminRouter);     // Phase 5
+  // Writes are limited per fingerprint/hour; reads per IP/minute.
+  app.use('/contributions', contribLimiter, contributionsRouter);
+  app.use('/routes', readLimiter, routesRouter);
+  app.use('/stops', readLimiter, stopsRouter);
+  app.use('/flags', readLimiter, flagsRouter);
+  app.use('/admin', readLimiter, adminRouter);
 
   // 404 for anything unmatched.
   app.use((req: Request, res: Response) => {

@@ -24,6 +24,7 @@ const schema = z.object({
   PORT: intFromEnv(3001),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   RATE_LIMIT_CONTRIB_PER_HOUR: intFromEnv(5),
+  RATE_LIMIT_READ_PER_MIN: intFromEnv(100),
   MIN_REPORTS_FOR_ROUTING: intFromEnv(3),
   OUTLIER_SIGMA: intFromEnv(2),
   ROUTE_CACHE_TTL_SECONDS: intFromEnv(300),
