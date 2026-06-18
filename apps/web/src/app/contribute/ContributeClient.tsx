@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { X, Info, AlertTriangle, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '../../store/useToast';
 import VehicleSelect from '../components/VehicleSelect';
 import StopBuilder from '../components/StopBuilder';
 import { useRouteQuery } from '../../hooks/useRouteQueries';
@@ -55,7 +55,11 @@ export default function ContributeClient({ prefillRouteId }: { prefillRouteId: s
   }, [stops]);
 
   async function doSubmit(userConfirmed: boolean) {
-    if (!validation.canSubmit || submitting || cooldown) return;
+    if (submitting || cooldown) return;
+    if (!validation.canSubmit) {
+      toast.warn('Add at least 2 stops before submitting');
+      return;
+    }
     setSubmitting(true);
     setDuplicate(null);
     try {
@@ -72,26 +76,29 @@ export default function ContributeClient({ prefillRouteId }: { prefillRouteId: s
 
       switch (outcome.kind) {
         case 'success':
+          toast.success('Submitted! Your route is in the review queue');
           router.push('/contribute/success');
           return;
         case 'warning':
           setWarnings(outcome.result.warnings);
-          toast('Heads up — review the note below before submitting.');
+          toast.info('Heads up — review the note below before submitting');
           break;
         case 'duplicate':
           setDuplicate(outcome.error.existing_route);
           break;
-        case 'rate_limit':
-          toast(`Too many submissions. Try again in ${outcome.error.retry_after}s.`);
+        case 'rate_limit': {
+          const mins = Math.max(1, Math.ceil(outcome.error.retry_after / 60));
+          toast.warn(`Limit reached — 5/hour. Try again in ${mins} min`);
           setCooldown(true);
           setTimeout(() => setCooldown(false), outcome.error.retry_after * 1000);
           break;
+        }
         case 'validation':
-          toast(outcome.error.details[0]?.message ?? 'Please check the form.');
+          toast.warn(outcome.error.details[0]?.message ?? 'Add at least 2 stops before submitting');
           break;
       }
     } catch {
-      toast('Network error — your route wasn’t submitted. Try again.');
+      toast.error('Network error — your route wasn’t submitted. Try again.');
     } finally {
       setSubmitting(false);
     }
