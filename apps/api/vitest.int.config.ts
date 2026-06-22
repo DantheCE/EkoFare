@@ -10,6 +10,10 @@ export default defineConfig({
     environment: 'node',
     include: ['src/**/*.int.test.ts'],
     fileParallelism: false,
+    // Each test reseeds the graph (several ingests + a rebuild) against a real
+    // Postgres; that runs 4-5s on a slow box, right at vitest's 5s default. Give
+    // the lane headroom so the suite doesn't flake on timing alone.
+    testTimeout: 20000,
     setupFiles: ['src/test/setup.int.ts'],
     env: {
       NODE_ENV: 'test',

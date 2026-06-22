@@ -91,6 +91,27 @@ describe('GET /routes', () => {
     expect(res.status).toBe(400);
     expect(res.body.error).toBe('VALIDATION_ERROR');
   });
+
+  // Regression: clicking a board route must open its detail. Board routes carry
+  // stable dyn: ids, not FeaturedRoute row ids (which rotate every rebuild), so
+  // GET /routes/:id resolves them — even after a rebuild reissues the rows.
+  it('serves board ids that GET /routes/:id resolves, surviving a rebuild', async () => {
+    await seedNetwork();
+
+    const list = await request(app).get('/routes');
+    const boardId = list.body.routes[0].id as string;
+    expect(boardId).toMatch(/^dyn:/);
+
+    const detail = await request(app).get(`/routes/${encodeURIComponent(boardId)}`);
+    expect(detail.status).toBe(200);
+    expect(detail.body.id).toBe(boardId);
+
+    // Rebuild rotates the underlying FeaturedRoute row ids; the dyn id still opens.
+    await rebuildFeaturedRoutes();
+    const afterRebuild = await request(app).get(`/routes/${encodeURIComponent(boardId)}`);
+    expect(afterRebuild.status).toBe(200);
+    expect(afterRebuild.body.id).toBe(boardId);
+  });
 });
 
 describe('GET /routes/search', () => {
