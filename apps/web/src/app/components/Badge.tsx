@@ -3,7 +3,9 @@ import type { RouteStatus } from '../../types';
 // ─────────────────────────────────────────────────────────────────────────────
 // Badge (Spec §6.5). Status badges: FRAGMENT renders nothing (hidden from
 // lists); UNVERIFIED grey; VERIFIED go-tinted "✓ Verified"; MAJOR yellow-tinted
-// "★ Major". Generic <Badge> handles vehicle/duration pills.
+// "★ Major". An optional rider `count` (route.verification_count, the weakest-leg
+// report count) is appended: full → "✓ Verified · 12"; compact → "✓ 12" for
+// dense list cards and the farebar. Generic <Badge> handles vehicle/duration pills.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function Badge({
@@ -36,11 +38,48 @@ export function Badge({
   );
 }
 
-export function StatusBadge({ status }: { status: RouteStatus }) {
+const STATUS_META: Record<
+  Exclude<RouteStatus, 'FRAGMENT'>,
+  { tone: 'neutral' | 'go' | 'yellow'; symbol: string; label: string }
+> = {
+  UNVERIFIED: { tone: 'neutral', symbol: '○', label: 'Unverified' },
+  VERIFIED: { tone: 'go', symbol: '✓', label: 'Verified' },
+  MAJOR: { tone: 'yellow', symbol: '★', label: 'Major' },
+};
+
+export function StatusBadge({
+  status,
+  count,
+  variant = 'full',
+}: {
+  status: RouteStatus;
+  /** Rider count (route.verification_count). Appended when present. */
+  count?: number;
+  /** full → "✓ Verified · 12" (headers); compact → "✓ 12" (cards, farebar). */
+  variant?: 'full' | 'compact';
+}) {
   if (status === 'FRAGMENT') return null;
-  if (status === 'UNVERIFIED')
-    return <Badge tone="neutral">Unverified</Badge>;
-  if (status === 'VERIFIED')
-    return <Badge tone="go">✓ Verified</Badge>;
-  return <Badge tone="yellow">★ Major</Badge>;
+  const meta = STATUS_META[status];
+  const hasCount = typeof count === 'number';
+
+  if (variant === 'compact') {
+    return (
+      <Badge tone={meta.tone}>
+        <span aria-hidden>{meta.symbol}</span>
+        {hasCount && <span className="tnum">{count}</span>}
+      </Badge>
+    );
+  }
+
+  return (
+    <Badge tone={meta.tone}>
+      {status === 'UNVERIFIED' ? meta.label : `${meta.symbol} ${meta.label}`}
+      {hasCount && (
+        <>
+          {' · '}
+          <span className="tnum">{count}</span>
+        </>
+      )}
+    </Badge>
+  );
 }

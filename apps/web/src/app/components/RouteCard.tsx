@@ -62,7 +62,7 @@ export default function RouteCard({ route }: { route: Route }) {
             {route.name}
           </span>
           <span className="shrink-0">
-            <StatusBadge status={route.status} />
+            <StatusBadge status={route.status} count={route.verification_count} variant="compact" />
           </span>
         </span>
         <span className="mt-1 block text-[13px] text-muted">

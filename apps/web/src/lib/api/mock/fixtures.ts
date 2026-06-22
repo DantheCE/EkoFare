@@ -129,6 +129,19 @@ const SEED: SeedRoute[] = [
       ['Mile 12', 200],
     ],
   },
+  {
+    id: 'sangotedo-ajah',
+    vehicle: 'DANFO',
+    status: 'UNVERIFIED',
+    duration_min: 35,
+    verification_count: 3,
+    last_updated: '2026-06-20T08:00:00Z',
+    legs: [
+      ['Sangotedo', 0],
+      ['Lekki Phase 1', 250],
+      ['Ajah', 200],
+    ],
+  },
 ];
 
 export const MOCK_ROUTES: Route[] = SEED.map(buildRoute);
