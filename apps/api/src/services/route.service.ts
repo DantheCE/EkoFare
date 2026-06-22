@@ -129,9 +129,17 @@ export async function getRouteById(id: string): Promise<Route> {
 
 /** Hydrate a stored FeaturedRoute against the current graph. Returns null when a
  *  leg has dropped below the routing threshold since the row was built (the
- *  caller decides whether that's a 404 or just a skip in a list). */
+ *  caller decides whether that's a 404 or just a skip in a list).
+ *
+ *  The route is given its stable `dyn:{from}:{to}:{vehicle}` id, NOT the
+ *  FeaturedRoute row id. Rebuilds replace the board with deleteMany+createMany,
+ *  so row ids rotate every hour (and 10s after each boot). A client holding a
+ *  rotated row id would 404 on GET /routes/:id; the dyn id recomputes from the
+ *  live graph and stays valid across rebuilds. The row id never leaves the API. */
 export function hydrateFeatured(featured: FeaturedRoute, graph: RoutableGraph): Route | null {
   const path = reconstructPath(graph.byVehicle.get(featured.vehicle), featured.path);
   if (!path) return null;
-  return hydrateRoute(featured.id, path, featured.vehicle, graph.stopName);
+  const fromId = featured.path[0];
+  const toId = featured.path[featured.path.length - 1];
+  return hydrateRoute(dynRouteId(fromId, toId, featured.vehicle), path, featured.vehicle, graph.stopName);
 }
