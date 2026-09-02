@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bus, Search, Bookmark, Plus } from 'lucide-react';
+import { Bus, Search, Bookmark, Plus, ClipboardCheck } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// BottomNav (Spec §6.6). 4 tabs: Routes, Search, Saved, Add. Active = yellow
+// BottomNav (Spec §6.6). 5 tabs: Routes, Search, Saved, Add, Review. Active = yellow
 // icon tile + yellow label; inactive = ink-4 tile + faint label. ink-2 bar,
 // top border, safe-area bottom padding. ≥44px targets.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -15,6 +15,7 @@ const TABS = [
   { label: 'Search', href: '/search', icon: Search, match: (p: string) => p.startsWith('/search') },
   { label: 'Saved', href: '/saved', icon: Bookmark, match: (p: string) => p.startsWith('/saved') },
   { label: 'Add', href: '/contribute', icon: Plus, match: (p: string) => p.startsWith('/contribute') },
+  { label: 'Review', href: '/review', icon: ClipboardCheck, match: (p: string) => p.startsWith('/review') },
 ];
 
 export default function BottomNav() {
