@@ -133,5 +133,6 @@ export async function getRouteById(id: string): Promise<Route> {
 export function hydrateFeatured(featured: FeaturedRoute, graph: RoutableGraph): Route | null {
   const path = reconstructPath(graph.byVehicle.get(featured.vehicle), featured.path);
   if (!path) return null;
-  return hydrateRoute(featured.id, path, featured.vehicle, graph.stopName);
+  const id = dynRouteId(featured.path[0], featured.path[featured.path.length - 1], featured.vehicle);
+  return hydrateRoute(id, path, featured.vehicle, graph.stopName);
 }
