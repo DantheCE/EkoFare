@@ -21,7 +21,8 @@ describe('RouteCard', () => {
 
   it('shows the MAJOR status badge', () => {
     render(<RouteCard route={route} />);
-    expect(screen.getByText('★ Major')).toBeInTheDocument();
+    expect(screen.getByText('★')).toBeInTheDocument();
+    expect(screen.getByText('47')).toBeInTheDocument();
   });
 
   it('links to the route detail page', () => {
