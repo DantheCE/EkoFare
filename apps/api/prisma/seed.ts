@@ -108,6 +108,11 @@ async function seedLeg(leg: Leg): Promise<void> {
 }
 
 async function main(): Promise<void> {
+  if (process.env.NODE_ENV === 'production') {
+    logger.info('Skipping database seed in production environment');
+    return;
+  }
+
   logger.info(`seeding ${NETWORK.length} connections…`);
   for (const leg of NETWORK) {
     await seedLeg(leg);
