@@ -105,3 +105,22 @@ export async function getStopRoutes(name: string): Promise<StopRoutesResult> {
   );
   return res.data;
 }
+
+export interface QueueConnection {
+  id: string;
+  from_stop: { id: string; name: string };
+  to_stop: { id: string; name: string };
+  vehicle: string;
+  median_fare: number;
+  fare_reports: number;
+}
+
+/** GET /routes/queue — community review queue of unverified connections */
+export async function getQueue(): Promise<{ queue: QueueConnection[] }> {
+  if (USE_MOCKS) {
+    await mockLatency();
+    return { queue: [] };
+  }
+  const res = await apiClient.get<{ queue: QueueConnection[] }>('/routes/queue');
+  return res.data;
+}

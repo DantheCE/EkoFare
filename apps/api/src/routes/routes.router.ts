@@ -14,6 +14,7 @@ import { z } from 'zod';
 import { findRoute, getRouteById } from '../services/route.service';
 import { listRoutes, searchRoutesAndStops } from '../services/featured.service';
 import { validation } from '../lib/errors';
+import { prisma } from '../lib/prisma';
 
 const VEHICLES = ['DANFO', 'BRT', 'KEKE', 'OKADA', 'FERRY', 'RIDESHARE'] as const;
 const STATUSES = ['FRAGMENT', 'UNVERIFIED', 'VERIFIED', 'MAJOR'] as const;
@@ -40,6 +41,24 @@ routesRouter.get('/', async (req: Request, res: Response, next: NextFunction) =>
     }
     const routes = await listRoutes(parsed.data);
     res.json({ routes });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /routes/queue — community review queue of unverified connections
+routesRouter.get('/queue', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const queue = await prisma.connection.findMany({
+      where: { status: 'UNVERIFIED' },
+      include: {
+        from_stop: { select: { id: true, name: true } },
+        to_stop: { select: { id: true, name: true } },
+      },
+      orderBy: { last_verified: 'desc' },
+      take: 50,
+    });
+    res.json({ queue });
   } catch (err) {
     next(err);
   }
