@@ -15,9 +15,12 @@ let client: Redis | null = null;
 if (env.REDIS_URL) {
   client = new Redis(env.REDIS_URL, {
     lazyConnect: true,
-    maxRetriesPerRequest: 2,
+    maxRetriesPerRequest: null,
     // Bounded backoff: don't hammer a down Redis, but recover when it returns.
-    retryStrategy: (times) => Math.min(times * 200, 2000),
+    retryStrategy: (times) => {
+      if (times > 20) return null;
+      return Math.min(times * 200, 2000);
+    },
   });
 
   client.on('error', (err) => {
