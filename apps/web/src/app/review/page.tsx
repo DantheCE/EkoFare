@@ -8,12 +8,12 @@ export const metadata: Metadata = {
 
 export default function ReviewPage() {
   return (
-    <main className="min-h-screen bg-black text-white p-4 pt-8 md:p-8 max-w-2xl mx-auto pb-24">
+    <main className="px-4 pt-[calc(16px+env(safe-area-inset-top))] pb-24 max-w-2xl mx-auto">
       <header className="mb-8">
-        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-yellow-400">
-          Review Queue
+        <h1 className="text-[26px] font-extrabold leading-tight text-cream">
+          Review <span className="text-yellow">Queue</span>
         </h1>
-        <p className="mt-2 text-zinc-400 uppercase tracking-widest text-sm font-bold">
+        <p className="mt-1 text-[14px] text-muted">
           Verify community submissions
         </p>
       </header>
