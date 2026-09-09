@@ -10,6 +10,14 @@ export type Vehicle = 'DANFO' | 'BRT' | 'KEKE' | 'OKADA' | 'FERRY' | 'RIDESHARE'
 
 export type RouteStatus = 'FRAGMENT' | 'UNVERIFIED' | 'VERIFIED' | 'MAJOR';
 
+export type Role = 'USER' | 'MODERATOR' | 'ADMIN';
+
+export interface User {
+  id: string;
+  name: string;
+  role: Role;
+}
+
 export interface Stop {
   id: string;
   name: string;

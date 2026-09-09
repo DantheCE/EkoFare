@@ -11,14 +11,19 @@ import { toast } from '../../store/useToast';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 
+import { useUserStore, MOCK_USERS } from '../../store/useUserStore';
+
 export default function ReviewClient() {
   const queryClient = useQueryClient();
   const [actingOn, setActingOn] = useState<string | null>(null);
+  const { user } = useUserStore();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['queue'],
     queryFn: getQueue,
   });
+
+  const isMod = user.role === 'MODERATOR' || user.role === 'ADMIN';
 
   const verifyMutation = useMutation({
     mutationFn: async (conn: QueueConnection) => {
@@ -95,6 +100,18 @@ export default function ReviewClient() {
     },
   });
 
+  if (!isMod) {
+    return (
+      <div className="px-4 pt-[calc(16px+env(safe-area-inset-top))]">
+        <UserSwitcher />
+        <div className="flex h-[50vh] flex-col items-center justify-center text-center">
+          <p className="text-[16px] font-bold text-cream">Moderator Access Required</p>
+          <p className="mt-2 text-[14px] text-muted">You do not have permission to review routes.</p>
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return <div className="text-[14px] text-muted font-bold tracking-widest uppercase mt-12 text-center">Loading Queue...</div>;
   }
@@ -111,6 +128,9 @@ export default function ReviewClient() {
 
   return (
     <>
+      <div className="mb-6">
+        <UserSwitcher />
+      </div>
       <header className="flex items-end justify-between pb-[26px] mb-[14px] border-b border-[#211E14]">
         <div>
           <div className="font-[family-name:var(--font-body)] font-bold text-[11px] tracking-[0.18em] text-yellow uppercase mb-3 flex items-center gap-[10px] before:content-[''] before:w-[26px] before:h-[2px] before:bg-yellow">Moderation</div>
@@ -226,5 +246,29 @@ export default function ReviewClient() {
         )}
       </div>
     </>
+  );
+}
+
+function UserSwitcher() {
+  const { user, setUser } = useUserStore();
+  
+  return (
+    <div className="flex items-center justify-between rounded-card border border-line bg-ink-2 p-3">
+      <div className="text-[13px] font-bold text-cream">Mock User</div>
+      <select
+        className="rounded border border-line bg-ink-3 px-2 py-1 text-[13px] text-cream"
+        value={user.id}
+        onChange={(e) => {
+          const match = MOCK_USERS.find((u) => u.id === e.target.value);
+          if (match) setUser(match);
+        }}
+      >
+        {MOCK_USERS.map((u) => (
+          <option key={u.id} value={u.id}>
+            {u.name} ({u.role})
+          </option>
+        ))}
+      </select>
+    </div>
   );
 }
