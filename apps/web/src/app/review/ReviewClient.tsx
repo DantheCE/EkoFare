@@ -11,19 +11,25 @@ import { toast } from '../../store/useToast';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 
-import { useUserStore, MOCK_USERS } from '../../store/useUserStore';
+import { useAuthStore } from '../../store/useAuthStore';
+import { apiClient } from '../../lib/api/client';
+import { isAxiosError } from 'axios';
 
 export default function ReviewClient() {
   const queryClient = useQueryClient();
   const [actingOn, setActingOn] = useState<string | null>(null);
-  const { user } = useUserStore();
+  const { role, token, login, logout } = useAuthStore();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['queue'],
     queryFn: getQueue,
+    enabled: !!token,
   });
 
-  const isMod = user.role === 'MODERATOR' || user.role === 'ADMIN';
+  const isMod = role === 'MODERATOR' || role === 'ADMIN';
 
   const verifyMutation = useMutation({
     mutationFn: async (conn: QueueConnection) => {
@@ -101,12 +107,46 @@ export default function ReviewClient() {
   });
 
   if (!isMod) {
+    const handleLogin = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setLoginError('');
+      try {
+        const res = await apiClient.post('/admin/login', { email, password });
+        login(res.data.token);
+      } catch (err) {
+        if (isAxiosError(err)) {
+          const data = err.response?.data as { message?: string } | undefined;
+          setLoginError(data?.message || 'Login failed');
+        } else {
+          setLoginError('Login failed');
+        }
+      }
+    };
+
     return (
       <div className="px-4 pt-[calc(16px+env(safe-area-inset-top))]">
-        <UserSwitcher />
-        <div className="flex h-[50vh] flex-col items-center justify-center text-center">
-          <p className="text-[16px] font-bold text-cream">Moderator Access Required</p>
-          <p className="mt-2 text-[14px] text-muted">You do not have permission to review routes.</p>
+        <div className="flex h-[80vh] flex-col items-center justify-center text-center">
+          <p className="text-[24px] font-bold text-cream font-[family-name:var(--font-disp)] mb-6">Moderator Login</p>
+          <form onSubmit={handleLogin} className="flex flex-col gap-4 w-full max-w-[300px]">
+            <input 
+              type="email" 
+              placeholder="Admin Email" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="h-[48px] px-4 rounded-[12px] bg-ink-2 border border-line text-cream placeholder-muted focus:outline-none focus:border-yellow"
+            />
+            <input 
+              type="password" 
+              placeholder="Password" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="h-[48px] px-4 rounded-[12px] bg-ink-2 border border-line text-cream placeholder-muted focus:outline-none focus:border-yellow"
+            />
+            {loginError && <p className="text-stop text-[12px]">{loginError}</p>}
+            <button type="submit" className="h-[48px] mt-2 rounded-[12px] bg-yellow text-ink font-bold transition-transform active:scale-95">
+              Login
+            </button>
+          </form>
         </div>
       </div>
     );
@@ -127,9 +167,19 @@ export default function ReviewClient() {
   const queue = data?.queue || [];
 
   return (
-    <>
+    <div className="px-4 pt-[calc(16px+env(safe-area-inset-top))] pb-28">
       <div className="mb-6">
-        <UserSwitcher />
+        <div className="flex flex-wrap items-center justify-between rounded-card border border-yellow/30 bg-[rgba(255,206,58,0.08)] p-3 px-4">
+          <div className="flex items-center gap-2">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-yellow text-ink">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            <span className="text-[13px] font-bold text-cream">Admin Access</span>
+          </div>
+          <button onClick={logout} className="text-[13px] text-stop font-bold px-3 py-1.5 rounded-full bg-stop/10 hover:bg-stop/20 transition-colors">
+            Logout
+          </button>
+        </div>
       </div>
       <header className="flex items-end justify-between pb-[26px] mb-[14px] border-b border-[#211E14]">
         <div>
@@ -220,24 +270,26 @@ export default function ReviewClient() {
                   </div>
                 </div>
 
-                <div className="flex border-t border-line">
-                  <button
-                    type="button"
-                    onClick={() => verifyMutation.mutate(conn)}
-                    disabled={isActing}
-                    className="flex-1 p-[14px] text-center font-[family-name:var(--font-body)] text-[13px] font-bold flex items-center justify-center gap-[6px] bg-transparent border-none cursor-pointer transition-colors hover:bg-ink-3 disabled:opacity-50 disabled:pointer-events-none text-go border-r border-line"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.8 7.35L5.6 10.15L11.2 3.85" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    {isDispute ? 'Approve Spike' : 'Verify'}
-                  </button>
+                <div className="flex gap-3 px-[14px] pb-[14px] pt-2 border-t border-line mt-3">
                   <button
                     type="button"
                     onClick={() => rejectMutation.mutate(conn)}
                     disabled={isActing}
-                    className="flex-1 p-[14px] text-center font-[family-name:var(--font-body)] text-[13px] font-bold flex items-center justify-center gap-[6px] bg-transparent border-none cursor-pointer transition-colors hover:bg-ink-3 disabled:opacity-50 disabled:pointer-events-none text-stop"
+                    className="flex-1 h-10 rounded-button text-[14px] font-bold flex items-center justify-center gap-2 bg-ink-3 text-stop transition-colors hover:bg-ink-4 disabled:opacity-50 disabled:pointer-events-none"
+                    style={{ borderRadius: 'var(--radius-button)' }}
                   >
                     <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M7 1.4L12.6 12.6H1.4L7 1.4Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/><path d="M7 5.6V8.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/><circle cx="7" cy="10.8" r="0.9" fill="currentColor"/></svg>
                     {isDispute ? 'Reject' : 'Flag'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => verifyMutation.mutate(conn)}
+                    disabled={isActing}
+                    className="flex-1 h-10 rounded-button text-[14px] font-bold flex items-center justify-center gap-2 bg-yellow text-ink transition-opacity hover:opacity-90 disabled:opacity-50 disabled:pointer-events-none"
+                    style={{ borderRadius: 'var(--radius-button)' }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.8 7.35L5.6 10.15L11.2 3.85" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    {isDispute ? 'Approve Spike' : 'Verify'}
                   </button>
                 </div>
               </div>
@@ -245,30 +297,8 @@ export default function ReviewClient() {
           })
         )}
       </div>
-    </>
-  );
-}
-
-function UserSwitcher() {
-  const { user, setUser } = useUserStore();
-  
-  return (
-    <div className="flex items-center justify-between rounded-card border border-line bg-ink-2 p-3">
-      <div className="text-[13px] font-bold text-cream">Mock User</div>
-      <select
-        className="rounded border border-line bg-ink-3 px-2 py-1 text-[13px] text-cream"
-        value={user.id}
-        onChange={(e) => {
-          const match = MOCK_USERS.find((u) => u.id === e.target.value);
-          if (match) setUser(match);
-        }}
-      >
-        {MOCK_USERS.map((u) => (
-          <option key={u.id} value={u.id}>
-            {u.name} ({u.role})
-          </option>
-        ))}
-      </select>
     </div>
   );
 }
+
+

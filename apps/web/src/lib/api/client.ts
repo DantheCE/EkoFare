@@ -8,8 +8,6 @@
 import axios from 'axios';
 import { getFingerprint } from '../fingerprint';
 
-export const USE_MOCKS = process.env.NEXT_PUBLIC_USE_MOCKS !== 'false';
-
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3001';
 
 export const apiClient = axios.create({
@@ -19,6 +17,20 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use((config) => {
   config.headers.set('X-EkoFare-Fingerprint', getFingerprint());
+  
+  // Attach auth token if available
+  const authStoreStr = typeof window !== 'undefined' ? localStorage.getItem('ekofare-auth') : null;
+  if (authStoreStr) {
+    try {
+      const authStore = JSON.parse(authStoreStr);
+      if (authStore?.state?.token) {
+        config.headers.set('Authorization', `Bearer ${authStore.state.token}`);
+      }
+    } catch {
+      // Ignore parse errors
+    }
+  }
+  
   return config;
 });
 

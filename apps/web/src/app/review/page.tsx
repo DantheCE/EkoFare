@@ -7,9 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function ReviewPage() {
-  return (
-    <main className="max-w-2xl mx-auto min-h-[100dvh] pt-[48px] px-[32px] pb-[100px]">
-      <ReviewClient />
-    </main>
-  );
+  return <ReviewClient />;
 }

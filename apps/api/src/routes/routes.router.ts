@@ -15,6 +15,7 @@ import { findRoute, getRouteById } from '../services/route.service';
 import { listRoutes, searchRoutesAndStops } from '../services/featured.service';
 import { validation } from '../lib/errors';
 import { prisma } from '../lib/prisma';
+import { requireAdmin } from '../middleware/auth';
 
 const VEHICLES = ['DANFO', 'BRT', 'KEKE', 'OKADA', 'FERRY', 'RIDESHARE'] as const;
 const STATUSES = ['FRAGMENT', 'UNVERIFIED', 'VERIFIED', 'MAJOR'] as const;
@@ -47,7 +48,7 @@ routesRouter.get('/', async (req: Request, res: Response, next: NextFunction) =>
 });
 
 // GET /routes/queue — community review queue of unverified connections
-routesRouter.get('/queue', async (req: Request, res: Response, next: NextFunction) => {
+routesRouter.get('/queue', requireAdmin, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const queue = await prisma.connection.findMany({
       where: { status: 'UNVERIFIED' },
