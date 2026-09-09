@@ -3,9 +3,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getQueue, type QueueConnection } from '../../lib/api/routes';
-import { submitContribution } from '../../lib/api/contributions';
 import { submitFlag } from '../../lib/api/flags';
-import type { Vehicle } from '../../types';
 import { formatFare } from '../../lib/fare';
 import { toast } from '../../store/useToast';
 import Link from 'next/link';
@@ -33,26 +31,13 @@ export default function ReviewClient() {
 
   const verifyMutation = useMutation({
     mutationFn: async (conn: QueueConnection) => {
-      // Re-submit the leg as a contribution to bump consensus
-      return submitContribution({
-        submitted_name: `${conn.from_stop.name} to ${conn.to_stop.name}`,
-        vehicle: conn.vehicle as Vehicle,
-        stops: [
-          { name: conn.from_stop.name, leg_fare: 0 },
-          { name: conn.to_stop.name, leg_fare: conn.median_fare },
-        ],
-      }, { userConfirmed: true });
+      return apiClient.post(`/routes/queue/${conn.id}/verify`);
     },
     onMutate: async (conn) => {
       setActingOn(conn.id);
       await queryClient.cancelQueries({ queryKey: ['queue'] });
       const previous = queryClient.getQueryData<{ queue: QueueConnection[] }>(['queue']);
       
-      if (previous) {
-        queryClient.setQueryData(['queue'], {
-          queue: previous.queue.filter((c) => c.id !== conn.id),
-        });
-      }
       return { previous };
     },
     onError: (err, conn, context) => {
@@ -63,6 +48,12 @@ export default function ReviewClient() {
       toast.error('Failed to verify route');
     },
     onSuccess: (data, conn) => {
+      const previous = queryClient.getQueryData<{ queue: QueueConnection[] }>(['queue']);
+      if (previous) {
+        queryClient.setQueryData(['queue'], {
+          queue: previous.queue.filter((c) => c.id !== conn.id),
+        });
+      }
       toast.success(`${conn.from_stop.name} \u2192 ${conn.to_stop.name} verified at ${formatFare(conn.median_fare)}`);
     },
     onSettled: () => {
@@ -83,11 +74,6 @@ export default function ReviewClient() {
       await queryClient.cancelQueries({ queryKey: ['queue'] });
       const previous = queryClient.getQueryData<{ queue: QueueConnection[] }>(['queue']);
       
-      if (previous) {
-        queryClient.setQueryData(['queue'], {
-          queue: previous.queue.filter((c) => c.id !== conn.id),
-        });
-      }
       return { previous };
     },
     onError: (err, conn, context) => {
@@ -97,7 +83,13 @@ export default function ReviewClient() {
       setActingOn(null);
       toast.error('Failed to flag route');
     },
-    onSuccess: () => {
+    onSuccess: (data, conn) => {
+      const previous = queryClient.getQueryData<{ queue: QueueConnection[] }>(['queue']);
+      if (previous) {
+        queryClient.setQueryData(['queue'], {
+          queue: previous.queue.filter((c) => c.id !== conn.id),
+        });
+      }
       toast.success('Flagged and removed from queue');
     },
     onSettled: () => {
@@ -124,7 +116,7 @@ export default function ReviewClient() {
     };
 
     return (
-      <div className="px-4 pt-[calc(16px+env(safe-area-inset-top))]">
+      <div className="px-4 pt-[calc(16px+env(safe-area-inset-top))] animate-fade-in">
         <div className="flex h-[80vh] flex-col items-center justify-center text-center">
           <p className="text-[24px] font-bold text-cream font-[family-name:var(--font-disp)] mb-6">Moderator Login</p>
           <form onSubmit={handleLogin} className="flex flex-col gap-4 w-full max-w-[300px]">
@@ -167,7 +159,7 @@ export default function ReviewClient() {
   const queue = data?.queue || [];
 
   return (
-    <div className="px-4 pt-[calc(16px+env(safe-area-inset-top))] pb-28">
+    <div className="px-4 pt-[calc(16px+env(safe-area-inset-top))] pb-28 animate-fade-in">
       <div className="mb-6">
         <div className="flex flex-wrap items-center justify-between rounded-card border border-yellow/30 bg-[rgba(255,206,58,0.08)] p-3 px-4">
           <div className="flex items-center gap-2">

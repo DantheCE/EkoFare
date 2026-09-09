@@ -57,6 +57,7 @@ model Connection {
   from_stop        Stop         @relation("from_stop", fields: [from_stop_id], references: [id], onDelete: Cascade)
   to_stop          Stop         @relation("to_stop", fields: [to_stop_id], references: [id], onDelete: Cascade)
   reports          FareReport[]
+  abuse_flags      AbuseFlag[]
 
   @@unique([from_stop_id, to_stop_id, vehicle])
   @@index([from_stop_id, vehicle])
@@ -101,8 +102,9 @@ model StopAlias {
 }
 
 model AbuseFlag {
-  id            String   @id @default(cuid())
+  id            String      @id @default(cuid())
   connection_id String?
+  connection    Connection? @relation(fields: [connection_id], references: [id], onDelete: Cascade)
   report_id     String?
   reason        String
   fingerprint   String

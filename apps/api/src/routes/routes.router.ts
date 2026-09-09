@@ -13,9 +13,10 @@ import { Router, type Request, type Response, type NextFunction } from 'express'
 import { z } from 'zod';
 import { findRoute, getRouteById } from '../services/route.service';
 import { listRoutes, searchRoutesAndStops } from '../services/featured.service';
-import { validation } from '../lib/errors';
+import { validation, notFound } from '../lib/errors';
 import { prisma } from '../lib/prisma';
 import { requireAdmin } from '../middleware/auth';
+import { recomputeConsensus } from '../services/consensus.service';
 
 const VEHICLES = ['DANFO', 'BRT', 'KEKE', 'OKADA', 'FERRY', 'RIDESHARE'] as const;
 const STATUSES = ['FRAGMENT', 'UNVERIFIED', 'VERIFIED', 'MAJOR'] as const;
@@ -51,7 +52,10 @@ routesRouter.get('/', async (req: Request, res: Response, next: NextFunction) =>
 routesRouter.get('/queue', requireAdmin, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const queue = await prisma.connection.findMany({
-      where: { status: 'UNVERIFIED' },
+      where: { 
+        status: 'UNVERIFIED',
+        abuse_flags: { none: { status: 'open' } }
+      },
       include: {
         from_stop: { select: { id: true, name: true } },
         to_stop: { select: { id: true, name: true } },
@@ -60,6 +64,33 @@ routesRouter.get('/queue', requireAdmin, async (req: Request, res: Response, nex
       take: 50,
     });
     res.json({ queue });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /routes/queue/:id/verify — Force verify an unverified connection
+routesRouter.post('/queue/:id/verify', requireAdmin, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const conn = await prisma.connection.findUnique({
+      where: { id: req.params.id },
+      select: { id: true, median_fare: true, fare_reports: true }
+    });
+    if (!conn) throw notFound('Connection not found');
+
+    const targetReports = 5;
+    const toAdd = targetReports - conn.fare_reports;
+    if (toAdd > 0) {
+      const data = Array.from({ length: toAdd }, (_, i) => ({
+        connection_id: conn.id,
+        fare: conn.median_fare,
+        fingerprint: `admin-verify-${conn.id}-${Date.now()}-${i}`,
+      }));
+      await prisma.fareReport.createMany({ data });
+      await recomputeConsensus(conn.id);
+    }
+    
+    res.status(200).json({ success: true });
   } catch (err) {
     next(err);
   }
