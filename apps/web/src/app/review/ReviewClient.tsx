@@ -105,6 +105,7 @@ export default function ReviewClient() {
       try {
         const res = await apiClient.post('/admin/login', { email, password });
         login(res.data.token);
+        toast.success('Logged in successfully');
       } catch (err) {
         if (isAxiosError(err)) {
           const data = err.response?.data as { message?: string } | undefined;
@@ -168,7 +169,7 @@ export default function ReviewClient() {
             </span>
             <span className="text-[13px] font-bold text-cream">Admin Access</span>
           </div>
-          <button onClick={logout} className="text-[13px] text-stop font-bold px-3 py-1.5 rounded-full bg-stop/10 hover:bg-stop/20 transition-colors">
+          <button onClick={() => { logout(); toast.success('Logged out successfully'); }} className="text-[13px] text-stop font-bold px-3 py-1.5 rounded-full bg-stop/10 hover:bg-stop/20 transition-colors">
             Logout
           </button>
         </div>
