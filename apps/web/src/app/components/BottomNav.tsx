@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bus, Search, Bookmark, Plus, ClipboardCheck } from 'lucide-react';
+import { Bus, Bookmark, Plus, ClipboardCheck } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BottomNav (Spec §6.6). 5 tabs: Routes, Search, Saved, Add, Review. Active = yellow
@@ -12,7 +12,6 @@ import { Bus, Search, Bookmark, Plus, ClipboardCheck } from 'lucide-react';
 
 const TABS = [
   { label: 'Routes', href: '/', icon: Bus, match: (p: string) => p === '/' || p.startsWith('/routes') },
-  { label: 'Search', href: '/search', icon: Search, match: (p: string) => p.startsWith('/search') },
   { label: 'Saved', href: '/saved', icon: Bookmark, match: (p: string) => p.startsWith('/saved') },
   { label: 'Add', href: '/contribute', icon: Plus, match: (p: string) => p.startsWith('/contribute') },
   { label: 'Review', href: '/review', icon: ClipboardCheck, match: (p: string) => p.startsWith('/review') },

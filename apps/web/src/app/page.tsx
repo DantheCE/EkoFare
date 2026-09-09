@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ChevronRight, RotateCw } from 'lucide-react';
+import { ChevronRight, RotateCw, Search } from 'lucide-react';
 import Wordmark from './components/Wordmark';
 import SearchBar from './components/SearchBar';
 import FilterChips, { type VehicleFilter } from './components/FilterChips';
@@ -28,9 +28,16 @@ export default function HomePage() {
 
   return (
     <div className="px-4 pt-[calc(16px+env(safe-area-inset-top))]">
-      {/* Top bar — Saved lives in the bottom nav, so the header is just the mark. */}
-      <header className="flex items-center">
+      {/* Top bar — Wordmark + Search button */}
+      <header className="flex items-center justify-between">
         <Wordmark size={28} />
+        <Link
+          href="/search"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-ink-2 text-cream hover:bg-ink-3 hover:text-yellow transition-colors"
+          aria-label="Search"
+        >
+          <Search size={20} />
+        </Link>
       </header>
 
       {/* Greeting + hero */}
