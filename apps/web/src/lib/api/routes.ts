@@ -113,6 +113,7 @@ export interface QueueConnection {
   vehicle: string;
   median_fare: number;
   fare_reports: number;
+  last_verified?: string | null;
 }
 
 /** GET /routes/queue — community review queue of unverified connections */
