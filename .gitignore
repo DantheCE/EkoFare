@@ -1,6 +1,7 @@
 node_modules
 .DS_Store
 AGENTS.md
+NEXT_SESSION.md
 
 # env files (real secrets — never commit)
 .env
